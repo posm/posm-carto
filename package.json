@@ -1,0 +1,20 @@
+{
+  "name": "posm-simple",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "(set -a && source .env && make project.xml) && tessera mapnik://./project.xml"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "carto": "^0.15.3",
+    "interp": "^0.1.1",
+    "js-yaml": "^3.4.6",
+    "millstone": "github:mojodna/millstone#updated-deps",
+    "pgexplode": "^1.0.1",
+    "tessera": "^0.6.0",
+    "tilelive-mapnik": "^0.6.17"
+  }
+}
