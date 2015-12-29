@@ -12,7 +12,6 @@
     "carto": "^0.15.3",
     "interp": "^0.1.1",
     "js-yaml": "^3.4.6",
-    "millstone": "github:mojodna/millstone#updated-deps",
     "pgexplode": "^1.0.1",
     "tessera": "^0.6.0",
     "tilelive-mapnik": "^0.6.17"

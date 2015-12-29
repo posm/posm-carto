@@ -30,7 +30,7 @@ clean:
 ## Generic Targets
 
 %: %.mml
-	@cp $< project.mml
+	@true
 
 .PRECIOUS: %.mml
 
@@ -44,7 +44,7 @@ clean:
 	@echo
 	@echo Building $@
 	@echo
-	@carto -l $< > $@ || (rm -f $@; false)
+	@carto $< > $@ || (rm -f $@; false)
 
 
 .PHONY: DATABASE_URL
