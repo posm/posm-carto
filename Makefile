@@ -34,7 +34,7 @@ clean:
 
 .PRECIOUS: %.mml
 
-%.mml: %.yml styles.mss
+%.mml: %.yml vars.mss bg.mss road.mss label.mss poi_classic.mss hdm.mss
 	@echo Building $@
 	@cat $< | interp | js-yaml > $@.tmp && mv $@.tmp $@
 

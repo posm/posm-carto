@@ -1,15 +1,15 @@
 # == Global project settings ===========================================
 
-name:             POSM
-attribution:      Data © OpenStreetMap Contributors
-center:           [-75.525, 39.158, 12]
+name:             'POSM (Portable OpenStreetMap)'
+description:      'POSM style based on the American Red Cross HDM style, ported from TileMill2 (Mapbox Studio Classic) back to TileMill1 for offline rendering'
+attribution:      'Map Data © OpenStreetMap'
+center:           [ 27.7, 85.3, 14]
 format:           png
 interactivity:    false
-minzoom:          0
+minzoom:          1
 maxzoom:          22
-scale:            1
-metatile:         4
 srs:              '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0.0 +k=1.0 +units=m +nadgrids=@null +wktext +no_defs +over'
+metatile:         2
 
 
 # == Layer & Datasource defaults =======================================
@@ -33,37 +33,498 @@ _pg_default:      &postgis
 # == Stylesheets =======================================================
 
 Stylesheet:
-  - styles.mss
+  - vars.mss
+  - bg.mss
+  - road.mss
+#  - label.mss
+#  - poi_classic.mss
+  - hdm.mss
 
 
 # == Layers ============================================================
 
 Layer:
 
+#  - landcover
   - <<: *layer
-    name: highway
-    id:   highway
-    status: on
+    name: landuse
+    id:   landuse
     Datasource:
       <<: *postgis
+      geometry_field: way
       table: >
         (
           SELECT
-            *
-          FROM planet_osm_roads
+            way,
+            name,
+            CASE WHEN leisure = 'common' OR landuse = 'village_green' THEN 'common'
+                 WHEN leisure = 'park' THEN 'park'
+                 WHEN leisure = 'garden' THEN 'garden'
+                 WHEN leisure = 'pitch' THEN 'pitch'
+                 WHEN leisure IN ('playground','recreation_ground') THEN 'playground'
+                 WHEN leisure = 'stadium' THEN 'stadium'
+                 WHEN landuse = 'cemetery' THEN 'cemetery'
+                 WHEN landuse = 'industrial' THEN 'industrial'
+                 WHEN landuse IN ('farmland','farm','farmyard','orchard') THEN 'agriculture'
+                 WHEN landuse = 'forest' OR "natural" = 'wood' THEN 'wood'
+                 WHEN landuse IN ('grass','greenfield','meadow') OR "natural" IN ('grass','grassland') THEN 'grass'
+                 WHEN "natural" IN ('rock','bare_rock') THEN 'rock'
+                 WHEN "natural" = 'sand' THEN 'sand'
+                 WHEN "natural" = 'glacier' THEN 'glacier'
+                 WHEN "natural" = 'scrub' THEN 'scrub'
+                 ELSE '' END as class
+          FROM planet_osm_polygon
           WHERE way && !bbox!
-        ) AS data
-
+            AND landuse IS NOT NULL
+            OR  leisure IS NOT NULL
+            OR "natural" IS NOT NULL
+        ) AS _
+  - <<: *layer
+    name: site
+    id:   site
+    Datasource:
+      <<: *postgis
+      geometry_field: way
+      table: >
+        (
+          SELECT
+            way,
+            name,
+            CASE WHEN amenity = 'shelter' OR tags->'shelter' = 'yes' THEN 'shelter'
+                 WHEN tags->'refugee' = 'yes' OR tags->'idp:camp_site' = 'spontaneous_camp' THEN 'camp'
+                 WHEN landuse = 'residential' THEN 'residential'
+                 WHEN leisure = 'common' THEN 'common'
+                 WHEN landuse = 'brownfield' THEN 'rubble'
+                 WHEN tags->'hazard' = 'landslide' THEN 'landslide'
+                 ELSE '' END as class
+          FROM planet_osm_polygon
+          WHERE way && !bbox!
+            AND amenity = 'shelter'
+            OR landuse IN ('residential','brownfield')
+            OR tags->'shelter' = 'yes'
+            OR tags->'refugee' = 'yes'
+            OR tags->'idp:camp_site' = 'spontaneous_camp'
+            OR leisure = 'common'
+            OR tags->'hazard' = 'landslide'
+        ) AS _
+  - <<: *layer
+    name: site_line
+    id:   site_line
+    Datasource:
+      <<: *postgis
+      geometry_field: way
+      table: >
+        (
+          SELECT
+            way,
+            name,
+            CASE WHEN amenity = 'shelter' OR tags->'shelter' = 'yes' THEN 'shelter'
+                 WHEN tags->'refugee' = 'yes' OR tags->'idp:camp_site' = 'spontaneous_camp' THEN 'camp'
+                 WHEN landuse = 'residential' THEN 'residential'
+                 WHEN leisure = 'common' THEN 'common'
+                 WHEN landuse = 'brownfield' THEN 'rubble'
+                 WHEN tags->'hazard' = 'landslide' THEN 'landslide'
+                 ELSE '' END as class
+          FROM planet_osm_line
+          WHERE way && !bbox!
+            AND amenity = 'shelter'
+            OR landuse IN ('residential','brownfield')
+            OR tags->'shelter' = 'yes'
+            OR tags->'refugee' = 'yes'
+            OR tags->'idp:camp_site' = 'spontaneous_camp'
+            OR leisure = 'common'
+            OR tags->'hazard' = 'landslide'
+        ) AS _
+  - <<: *layer
+    name: waterway
+    id:   waterway
+    Datasource:
+      <<: *postgis
+      geometry_field: way
+      table: >
+        (
+          SELECT
+            way,
+            name,
+            waterway AS class
+          FROM planet_osm_line
+          WHERE way && !bbox!
+          AND waterway IS NOT NULL
+        ) AS _
+  - <<: *layer
+    name: water
+    id:   water
+    Datasource:
+      <<: *postgis
+      geometry_field: way
+      table: >
+        (
+          SELECT
+            way,
+            name
+          FROM planet_osm_polygon
+          WHERE way && !bbox!
+          AND water IS NOT NULL
+          OR landuse = 'reservoir'
+          OR "natural" = 'water'
+        ) AS _
+#  - barrier_line
+#  - building
   - <<: *layer
     name: building
     id:   building
     Datasource:
       <<: *postgis
+      geometry_field: way
       table: >
         (
           SELECT
-            *
+            way,
+            name,
+            building as type
           FROM planet_osm_polygon
           WHERE way && !bbox!
-            AND building IS NOT NULL
-        ) AS data
+          AND building IS NOT NULL
+        ) AS _
+  - <<: *layer
+    name: building_condition
+    id:   building_condition
+    Datasource:
+      <<: *postgis
+      geometry_field: way
+      table: >
+        (
+          SELECT
+            way,
+            name,
+            CASE WHEN building = 'construction' THEN 'construction'
+                 WHEN tags->'damage' IN ('moderate','extensive','severe') THEN 'damaged'
+                 WHEN tags->'damage' IN ('total','destroyed','collapsed','collapse','partially_collapsed') OR building IN ('collapsed','collapse') THEN 'damaged'
+                 WHEN tags->'damage' = 'flooded' THEN 'flooded'
+                 ELSE '' END as class
+          FROM planet_osm_polygon
+          WHERE way && !bbox!
+            AND building IN ('construction','collapsed','collapse')
+            OR tags->'damage' IN ('moderate','extensive','severe','total','destroyed','collapsed','collapse','partially_collapsed','flooded')
+        ) AS _
+#  - landuse_overlay
+  - <<: *layer
+    name: landuse_overlay
+    id:   landuse_overlay
+    Datasource:
+      <<: *postgis
+      geometry_field: way
+      table: >
+        (
+          SELECT
+            way,
+            name,
+            CASE WHEN "natural" IN ('wetland','marsh','swamp','bog') OR wetland IN ('wetland','marsh','swamp','bog') THEN 'wetland'
+                 WHEN "natural" IN ('mud','tidalflat') OR wetland IN ('mud','tidalflat') THEN 'wetland_noveg'
+                 ELSE '' END as class
+          FROM planet_osm_polygon
+          WHERE way && !bbox!
+          AND "natural" IN ('wetland','marsh','swamp','bog','mud','tidalflat')
+          OR wetland IN ('wetland','marsh','swamp','bog','mud','tidalflat')
+        ) AS _
+#  - tunnel
+  - <<: *layer
+    name: road
+    id:   road
+    Datasource:
+      <<: *postgis
+      geometry_field: way
+      table: >
+        (
+          SELECT
+            way,
+            name,
+            highway as type,
+            access,
+            aerialway
+          FROM planet_osm_line
+          WHERE way && !bbox!
+          AND highway IN ('motorway','motorway_link','trunk','trunk_link','primary','primary_link','secondary','secondary_link','tertiary','tertiary_link','road','path','track','service','footway','bridleway','cycleway','steps','pedestrian','living_street','unclassified','residential','raceway')
+          OR aerialway IN ('chair_lift','mixed_lift','drag_lift','platter','t-bar','magic_carpet','gondola','cable_car','rope_tow','zip_line','j-bar','canopy')
+        ) AS _
+#  - bridge
+  - <<: *layer
+    name: road_condition
+    id:   road_condition
+    Datasource:
+      <<: *postgis
+      geometry_field: way
+      table: >
+        (
+          SELECT
+            way,
+            name,
+            CASE WHEN military = 'checkpoint' OR barrier = 'checkpoint' THEN 'checkpoint'
+                 WHEN barrier = 'debris' THEN 'debris'
+                 WHEN barrier = 'gate' THEN 'gate'
+                 ELSE '' END as class
+          FROM planet_osm_point
+          WHERE way && !bbox!
+            AND barrier IN ('checkpoint', 'debris','gate')
+            OR military = 'checkpoint'
+        ) AS _
+#  - aeroway
+  - <<: *layer
+    name: sanitation
+    id:   sanitation
+    Datasource:
+      <<: *postgis
+      geometry_field: way
+      table: >
+        (
+          SELECT
+            way,
+            name,
+            CASE WHEN amenity = 'shower' THEN 'shower'
+                 WHEN amenity = 'toilets' THEN 'toilet'
+                 WHEN amenity IN ('waste_disposal','waste_basket','sanitary_dump_station') OR landuse = 'landfill' OR man_made = 'wastewater_plant' OR tags->'informal' = 'dumpsite' THEN 'waste'
+                 ELSE '' END as class
+          FROM planet_osm_point
+          WHERE way && !bbox!
+            AND amenity IN ('shower', 'toilets','waste_disposal','waste_basket','sanitary_dump_station')
+            OR landuse = 'landfill'
+            OR man_made = 'wastewater_plant'
+            OR tags->'informal' = 'dumpsite'
+        ) AS _
+  - <<: *layer
+    name: sanitation_poly
+    id:   sanitation_poly
+    Datasource:
+      <<: *postgis
+      geometry_field: way
+      table: >
+        (
+          SELECT
+            way,
+            name,
+            CASE WHEN amenity = 'shower' THEN 'shower'
+                 WHEN amenity = 'toilets' THEN 'toilet'
+                 WHEN amenity IN ('waste_disposal','waste_basket','sanitary_dump_station') OR landuse = 'landfill' OR man_made = 'wastewater_plant' OR tags->'informal' = 'dumpsite' THEN 'waste'
+                 ELSE '' END as class
+          FROM planet_osm_polygon
+          WHERE way && !bbox!
+            AND amenity IN ('shower', 'toilets','waste_disposal','waste_basket','sanitary_dump_station')
+            OR landuse = 'landfill'
+            OR man_made = 'wastewater_plant'
+            OR tags->'informal' = 'dumpsite'
+        ) AS _
+  - <<: *layer
+    name: water_source
+    id:   water_source
+    Datasource:
+      <<: *postgis
+      geometry_field: way
+      table: >
+        (
+          SELECT
+            way,
+            name,
+            CASE WHEN man_made = 'water_well' THEN 'water well'
+                 WHEN man_made = 'water_tower' THEN 'water tower'
+                 WHEN man_made IN ('storage_tank','water_tank') THEN 'water tower'
+                 WHEN "natural" = 'spring' THEN 'spring'
+                 WHEN amenity = 'drinking_water' THEN 'drinking water'
+                 ELSE '' END as class,
+            CASE WHEN tags->'drinking_water' = 'yes' OR amenity = 'drinking_water' THEN 'yes'
+                 WHEN tags->'drinking_water' = 'no' THEN 'no'
+                 ELSE '' END as potable,
+            CASE WHEN tags->'pump' = 'yes' THEN 'yes'
+                 WHEN tags->'pump' = 'manual' OR tags->'pump_type' = 'manual' THEN 'manual'
+                 WHEN tags->'pump' = 'powered' OR tags->'pump_type' = 'powered_network' THEN 'powered'
+                 ELSE '' END as pump
+          FROM planet_osm_polygon
+          WHERE way && !bbox!
+            AND man_made IN ('water_well', 'water_tower','storage_tank','water_tank')
+            OR "natural" = 'spring'
+            OR amenity = 'drinking_water'
+        ) AS _
+  - <<: *layer
+    name: emergency
+    id:   emergency
+    Datasource:
+      <<: *postgis
+      geometry_field: way
+      table: >
+        (
+          SELECT
+            way,
+            name,
+            CASE WHEN tags->'emergency' IN ('ambulance_station','defibrillator','aed') OR tags->'medical' = 'aed' THEN 'medical rescue'
+                 WHEN tags->'emergency' IN ('fire_extinguisher','fire_hydrant','fire_hose','fire_flapper') THEN 'fire fighter'
+                 WHEN tags->'emergency' IN ('lifeguard_base','lifeguard_platform','lifeguard_place') THEN 'lifeguarding'
+                 WHEN tags->'emergency' = 'assembly_point' THEN 'assembly point'
+                 WHEN tags->'emergency' = 'access_point' THEN 'access point'
+                 WHEN tags->'emergency' = 'phone' THEN 'emergency phone'
+                 WHEN tags->'emergency' = 'siren' THEN 'emergency siren'
+                 WHEN aeroway = 'helipad' OR tags->'emergency:helipad' = 'potential' OR tags->'emergency' = 'landing_site' THEN 'helicopter'
+                 ELSE '' END as class
+          FROM planet_osm_point
+          WHERE way && !bbox!
+            AND tags->'emergency' IN ('ambulance_station','defibrillator','aed','fire_extinguisher','fire_hydrant','fire_hose','fire_flapper','assembly_point','access_point','phone','siren','landing_site')
+            OR tags->'medical' = 'aed'
+            OR tags->'emergency:helipad' = 'potential'
+            OR aeroway = 'helipad'
+        ) AS _
+  - <<: *layer
+    name: emergency_poly
+    id:   emergency_poly
+    Datasource:
+      <<: *postgis
+      geometry_field: way
+      table: >
+        (
+          SELECT
+            way,
+            name,
+            CASE WHEN tags->'emergency' IN ('ambulance_station','defibrillator','aed') OR tags->'medical' = 'aed' THEN 'medical rescue'
+                 WHEN tags->'emergency' IN ('fire_extinguisher','fire_hydrant','fire_hose','fire_flapper') THEN 'fire fighter'
+                 WHEN tags->'emergency' IN ('lifeguard_base','lifeguard_platform','lifeguard_place') THEN 'lifeguarding'
+                 WHEN tags->'emergency' = 'assembly_point' THEN 'assembly point'
+                 WHEN tags->'emergency' = 'access_point' THEN 'access point'
+                 WHEN tags->'emergency' = 'phone' THEN 'emergency phone'
+                 WHEN tags->'emergency' = 'siren' THEN 'emergency siren'
+                 WHEN aeroway = 'helipad' OR tags->'emergency:helipad' = 'potential' OR tags->'emergency' = 'landing_site' THEN 'helicopter'
+                 ELSE '' END as class
+          FROM planet_osm_polygon
+          WHERE way && !bbox!
+            AND tags->'emergency' IN ('ambulance_station','defibrillator','aed','fire_extinguisher','fire_hydrant','fire_hose','fire_flapper','assembly_point','access_point','phone','siren','landing_site')
+            OR tags->'medical' = 'aed'
+            OR tags->'emergency:helipad' = 'potential'
+            OR aeroway = 'helipad'
+        ) AS _
+  - <<: *layer
+    name: medical
+    id:   medical
+    Datasource:
+      <<: *postgis
+      geometry_field: way
+      table: >
+        (
+          SELECT
+            way,
+            name,
+            CASE WHEN amenity = 'hospital' THEN 'hospital'
+                 WHEN amenity = 'clinic' THEN 'clinic'
+                 WHEN tags->'health_facility_type' = 'field_hospital' OR tags->'health_facility:type' = 'field_hospital' THEN 'field hospital'
+                 WHEN amenity = 'pharmacy' THEN 'pharmacy'
+                 WHEN tags->'health_facility_type' = 'dispensary' OR tags->'health_facility:type' = 'dispensary' THEN 'dispensary'
+                 WHEN amenity = 'mortuary' THEN 'morgue'
+                 ELSE '' END as class
+          FROM planet_osm_polygon
+          WHERE way && !bbox!
+            AND amenity IN ('hospital', 'clinic','pharmacy','mortuary')
+            OR tags->'health_facility_type' IN ('field_hospital', 'dispensary')
+            OR tags->'health_facility:type' IN ('field_hospital', 'dispensary')
+        ) AS _
+  - <<: *layer
+    name: communication
+    id:   communication
+    Datasource:
+      <<: *postgis
+      geometry_field: way
+      table: >
+        (
+          SELECT
+            way,
+            name,
+            CASE WHEN tags->'tower:type' = 'communication' OR man_made = 'communications_tower' THEN 'tower'
+                 WHEN man_made = 'communications_dish' THEN 'dish'
+                 WHEN amenity = 'community_information_kiosk' OR tags->'board_type' = 'notice' THEN 'notice board'
+                 ELSE '' END as class
+          FROM planet_osm_point
+          WHERE way && !bbox!
+            AND man_made IN ('communications_tower', 'communications_dish')
+            OR amenity = 'community_information_kiosk'
+            OR tags->'tower:type' = 'communication'
+            OR tags->'board_type' = 'notice'
+        ) AS _
+  - <<: *layer
+    name: electric_utility
+    id:   electric_utility
+    Datasource:
+      <<: *postgis
+      geometry_field: way
+      table: >
+        (
+          SELECT
+            way,
+            name,
+            CASE WHEN power = 'generator' THEN 'generator'
+                 WHEN power IN ('tower','pole','line','minor_line') THEN 'transmission'
+                 WHEN power IN ('station','substation','sub_station','transformer') THEN 'distribution'
+                 ELSE '' END as class,
+            "generator:source" AS power_source,
+            CASE WHEN power = 'tower' THEN 'tower'
+                 WHEN power = 'pole' THEN 'pole'
+                 WHEN power IN ('line','minor_line') THEN 'line'
+                 ELSE '' END as structure
+          FROM planet_osm_point
+          WHERE way && !bbox!
+            AND power IN ('generator','tower','pole','line','minor_line','station','substation','sub_station','transformer')
+        ) AS _
+  - <<: *layer
+    name: electric_utility_line
+    id:   electric_utility_line
+    Datasource:
+      <<: *postgis
+      geometry_field: way
+      table: >
+        (
+          SELECT
+            way,
+            name,
+            CASE WHEN power = 'generator' THEN 'generator'
+                 WHEN power IN ('tower','pole','line','minor_line') THEN 'transmission'
+                 WHEN power IN ('station','substation','sub_station','transformer') THEN 'distribution'
+                 ELSE '' END as class,
+            "generator:source" AS power_source,
+            CASE WHEN power = 'tower' THEN 'tower'
+                 WHEN power = 'pole' THEN 'pole'
+                 WHEN power IN ('line','minor_line') THEN 'line'
+                 ELSE '' END as structure
+          FROM planet_osm_line
+          WHERE way && !bbox!
+            AND power IN ('generator','tower','pole','line','minor_line','station','substation','sub_station','transformer')
+        ) AS _
+  - <<: *layer
+    name: electric_utility_poly
+    id:   electric_utility_poly
+    Datasource:
+      <<: *postgis
+      geometry_field: way
+      table: >
+        (
+          SELECT
+            way,
+            name,
+            CASE WHEN power = 'generator' THEN 'generator'
+                 WHEN power IN ('tower','pole','line','minor_line') THEN 'transmission'
+                 WHEN power IN ('station','substation','sub_station','transformer') THEN 'distribution'
+                 ELSE '' END as class,
+            "generator:source" AS power_source,
+            CASE WHEN power = 'tower' THEN 'tower'
+                 WHEN power = 'pole' THEN 'pole'
+                 WHEN power IN ('line','minor_line') THEN 'line'
+                 ELSE '' END as structure
+          FROM planet_osm_polygon
+          WHERE way && !bbox!
+            AND power IN ('generator','tower','pole','line','minor_line','station','substation','sub_station','transformer')
+        ) AS _
+#  - admin
+#  - country_label_line
+#  - country_label
+#  - marine_label
+#  - state_label
+#  - place_label
+#  - water_label
+#  - poi_label
+#  - hdm_label
+#  - road_label
+#  - waterway_label
+#  - housenum_label
+##  - contour.label
