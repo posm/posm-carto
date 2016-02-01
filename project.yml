@@ -3,7 +3,7 @@
 name:             'POSM (Portable OpenStreetMap)'
 description:      'POSM style based on the American Red Cross HDM style, ported from TileMill2 (Mapbox Studio Classic) back to TileMill1 for offline rendering'
 attribution:      'Map Data © OpenStreetMap'
-center:           [ 27.7, 85.3, 14]
+center:           [ 85.3, 27.7, 14]
 format:           png
 interactivity:    false
 minzoom:          1
