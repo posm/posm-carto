@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 PATH := $(PATH):node_modules/.bin
-PROJECT_NAME := posm-simple
+PROJECT_NAME := posm-carto
 
 define EXPAND_EXPORTS
 export $(word 1, $(subst =, , $(1))) := $(word 2, $(subst =, , $(1)))
