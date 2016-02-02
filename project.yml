@@ -36,7 +36,7 @@ Stylesheet:
   - vars.mss
   - bg.mss
   - road.mss
-#  - label.mss
+  - label.mss
 #  - poi_classic.mss
   - hdm.mss
 
@@ -432,7 +432,7 @@ Layer:
           SELECT
             way,
             name,
-            CASE WHEN tags->'tower:type' = 'communication' OR man_made = 'communications_tower' THEN 'tower'
+            CASE WHEN "tower:type" = 'communication' OR man_made = 'communications_tower' THEN 'tower'
                  WHEN man_made = 'communications_dish' THEN 'dish'
                  WHEN amenity = 'community_information_kiosk' OR tags->'board_type' = 'notice' THEN 'notice board'
                  ELSE '' END as class
@@ -440,7 +440,7 @@ Layer:
           WHERE way && !bbox!
             AND man_made IN ('communications_tower', 'communications_dish')
             OR amenity = 'community_information_kiosk'
-            OR tags->'tower:type' = 'communication'
+            OR "tower:type" = 'communication'
             OR tags->'board_type' = 'notice'
         ) AS _
   - <<: *layer
@@ -520,11 +520,85 @@ Layer:
 #  - country_label
 #  - marine_label
 #  - state_label
-#  - place_label
+
+  - <<: *layer
+    id: place_label
+    name: place_label
+    Datasource:
+      <<: *postgis
+      table: |-
+        (SELECT
+            way,
+            place as 'type',
+            population,
+            name,
+            ref
+          FROM planet_osm_point
+          WHERE place IN ('city', 'town', 'suburb', 'village', 'hamlet', 'neighbourhood', 'locality', 'isolated_dwelling', 'farm', 'junction', 'traffic_signals')
+
+            AND name IS NOT NULL
+          ORDER BY CASE
+              WHEN place = 'city' THEN 1
+              WHEN place = 'town' THEN 2
+              WHEN place = 'suburb' THEN 3
+              WHEN place = 'village' THEN 4
+              WHEN place = 'hamlet' THEN 5
+              WHEN place = 'neighbourhood' THEN 6
+              WHEN place = 'locality' THEN 7
+              WHEN place = 'isolated_dwelling' THEN 8
+              WHEN place = 'farm' THEN 9
+              WHEN place = 'junction' THEN 10
+              WHEN place = 'traffic_signals' THEN 11
+            END ASC
+        ) AS place_label
+
 #  - water_label
 #  - poi_label
 #  - hdm_label
 #  - road_label
+  - <<: *layer
+    id: "roads-text-ref"
+    name: "roads-text-ref"
+    class: ""
+    geometry: "linestring"
+    <<: *extents
+    properties:
+      minzoom: 13
+    Datasource:
+      <<: *osm2pgsql
+     table: |-
+       --(SELECT * FROM
+       (SELECT
+         way,
+         highway,
+         orig_ref,
+         array_length(refs,1) AS height,
+         regexp_replace(orig_ref, '\s*;\s*', E'\n', 'g') AS refs,
+         MAX(ref_width) as reflen
+       FROM (
+         SELECT way, highway, orig_ref, refs, ref, SUM(CASE WHEN ascii_val < 255 THEN 1 ELSE 2 END) AS ref_width
+         FROM (
+           SELECT way, highway, orig_ref, refs, ref, ascii(unnest(string_to_array(ref,NULL))) as ascii_val
+           FROM (
+             SELECT way, highway, orig_ref, refs, trim(both from unnest(refs)) AS ref
+             FROM (
+               SELECT
+                       way,
+                       COALESCE(
+                         CASE WHEN highway IN ('motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'unclassified', 'residential') THEN highway ELSE NULL END,
+                         CASE WHEN aeroway IN ('runway', 'taxiway') THEN aeroway ELSE NULL END
+                       ) AS highway,
+                       ref as orig_ref,
+                       string_to_array(ref, ';') AS refs
+                     FROM planet_osm_line
+                       WHERE (highway IN ('motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'unclassified', 'residential') OR aeroway IN ('runway', 'taxiway'))
+                         AND ref IS NOT NULL AND ref LIKE '%;%'
+             ) AS query
+           ) AS query2
+         ) AS query3
+         GROUP BY way, highway, orig_ref, refs, ref
+       ) AS query4
+       GROUP BY way, highway, orig_ref, refs) as innerquery
+       --WHERE height <= 4 AND width <= 11) as roads_text_ref
 #  - waterway_label
 #  - housenum_label
-##  - contour.label

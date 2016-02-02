@@ -10,12 +10,12 @@
 @name: '[name]';
 
 // set up font sets for various weights and styles
-@sans_lt:           "DIN Offc Pro Medium", "Open Sans Regular","Arial Unicode MS Regular";
-@sans_lt_italic:    "DIN Offc Pro Medium Italic", "Open Sans Italic","Arial Unicode MS Regular";
-@sans:              "DIN Offc Pro Bold", "Open Sans Semibold","Arial Unicode MS Regular";
-@sans_bold:         "DIN Offc Pro Black", "Open Sans Bold","Arial Unicode MS Regular";
-@sans_italic:       "DIN Offc Pro Bold Italic", "Open Sans Semibold Italic","Arial Unicode MS Regular";
-@sans_bold_italic:  "DIN Offc Pro Black Italic", "Open Sans Bold Italic","Arial Unicode MS Regular";
+@sans_lt:           "Noto Sans Light";
+@sans_lt_italic:    "Noto Sans Light Italic";
+@sans:              "Noto Sans Regular";
+@sans_italic:       "Noto Sans Italic";
+@sans_bold:         "Noto Sans Bold";
+@sans__bold_italic: "Noto Sans Bold Italic";
 
 // =====================================================================
 // LANDUSE & LANDCOVER COLORS
