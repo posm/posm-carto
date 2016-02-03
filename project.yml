@@ -529,7 +529,7 @@ Layer:
       table: |-
         (SELECT
             way,
-            place as 'type',
+            place as type,
             population,
             name,
             ref
@@ -561,12 +561,9 @@ Layer:
     name: "roads-text-ref"
     class: ""
     geometry: "linestring"
-    <<: *extents
-    properties:
-      minzoom: 13
     Datasource:
-      <<: *osm2pgsql
-     table: |-
+      <<: *postgis
+      table: |-
        --(SELECT * FROM
        (SELECT
          way,
