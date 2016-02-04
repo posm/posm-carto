@@ -27,7 +27,7 @@
   ::rank5 [labelrank=5][zoom>=7],
   ::rank6 [labelrank=6][zoom>=8] {
     text-name: @name;
-    text-face-name: @sans_lt_italic;
+    text-face-name: @sans_italic;
     text-size: 15;
     text-transform: uppercase;
     text-character-spacing: 8;
@@ -148,7 +148,7 @@
 
 #place_label[type='suburb'][zoom>=15][zoom<=18] {
   text-name: @name;
-  text-face-name: @sans_lt;
+  text-face-name: @sans;
   text-placement: point;
   text-fill: @other_text;
   text-size: 11;
@@ -172,7 +172,7 @@
   [type='hamlet'],
   [type='neighbourhood'] {
     text-name: @name;
-    text-face-name: @sans_lt;
+    text-face-name: @sans;
     text-placement: point;
     text-fill: @other_text;
     text-size: 11;
@@ -265,7 +265,7 @@
 // =====================================================================
 
 // highway shield
-#roads-text-ref {
+#roads-text-ref[reflen<=6] {
   shield-name: "[refs]";
   shield-size: 9;
   shield-file: url('img/shield/generic-sm-[reflen].png');
@@ -352,7 +352,7 @@
 
 #housenum_label[zoom>=18] {
   text-name:'[house_num]';
-  text-face-name: @sans_lt_italic;
+  text-face-name: @sans_italic;
   text-fill: darken(@building, 50%);
   text-wrap-width: 50;
   text-wrap-before: true;

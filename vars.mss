@@ -6,12 +6,12 @@
 // FONTS
 // =====================================================================
 
+font-directory: url("fonts/");
+
 // Language
 @name: '[name]';
 
 // set up font sets for various weights and styles
-@sans_lt:           "Noto Sans Light";
-@sans_lt_italic:    "Noto Sans Light Italic";
 @sans:              "Noto Sans Regular";
 @sans_italic:       "Noto Sans Italic";
 @sans_bold:         "Noto Sans Bold";
