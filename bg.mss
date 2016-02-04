@@ -7,13 +7,14 @@ Map {
 // WATER AREAS
 // =====================================================================
 
+#coastline_water,
 #water {
   polygon-fill: @water;
   ::pattern { 
     polygon-pattern-file: url('img/pattern/water.svg');
     [zoom<10] { polygon-pattern-opacity: 0.2; }
     [zoom>=10] { polygon-pattern-opacity: 0.4; }
-    polygon-pattern-alignment: local;
+    polygon-pattern-alignment: global;
     comp-op: overlay;
   }
   [zoom<=5] {

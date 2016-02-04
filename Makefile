@@ -40,7 +40,7 @@ clean:
 
 .PRECIOUS: %.xml
 
-%.xml: %.mml
+%.xml: %.mml db/shapefiles
 	@echo
 	@echo Building $@
 	@echo
@@ -68,6 +68,30 @@ define create_extension
 	psql -v ON_ERROR_STOP=1 -qX1c "CREATE EXTENSION $(subst db/,,$@)"
 endef
 
+.PHONY: db/shapefiles
+
+db/shapefiles: shp/water_polygons.shp \
+	shp/water_polygons.dbf \
+	shp/water_polygons.prj \
+	shp/water_polygons.shx \
+	shp/water_polygons.index
+
+.SECONDARY: data/water_polygons.zip
+
+# so the zip matches the shapefile name
+data/water_polygons.zip:
+#	@mkdir -p $$(dirname $@)
+	curl -Lf http://data.openstreetmapdata.com/water-polygons-split-3857.zip -o $@
+
+shp/%.shp \
+shp/%.dbf \
+shp/%.prj \
+shp/%.shx: data/%.zip
+	@mkdir -p $$(dirname $@)
+	unzip -ju $< -d $$(dirname $@)
+
+shp/water_polygons.index: shp/water_polygons.shp
+	node_modules/.bin/mapnik-shapeindex.js $<
 
 # complete wrapping
 else
