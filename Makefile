@@ -81,7 +81,7 @@ db/shapefiles: shp/water_polygons.shp \
 # so the zip matches the shapefile name
 data/water_polygons.zip:
 	@mkdir -p $$(dirname $@)
-	curl -Lf http://data.openstreetmapdata.com/water-polygons-split-3857.zip -o $@
+	curl -Lf http://data.openstreetmapdata.com/water-polygons-split-3857.zip -z $@ -o $@
 
 shp/%.shp \
 shp/%.dbf \
