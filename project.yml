@@ -547,8 +547,8 @@ Layer:
             name,
             ref
           FROM planet_osm_point
-          WHERE place IN ('city', 'town', 'suburb', 'village', 'hamlet', 'neighbourhood', 'locality', 'isolated_dwelling', 'farm', 'junction', 'traffic_signals')
-
+          WHERE way && !bbox!
+            AND place IN ('city', 'town', 'suburb', 'village', 'hamlet', 'neighbourhood', 'locality', 'isolated_dwelling', 'farm', 'junction', 'traffic_signals')
             AND name IS NOT NULL
           ORDER BY CASE
               WHEN place = 'city' THEN 1
@@ -601,7 +601,8 @@ Layer:
                        ref as orig_ref,
                        string_to_array(ref, ';') AS refs
                      FROM planet_osm_line
-                       WHERE (highway IN ('motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'unclassified', 'residential') OR aeroway IN ('runway', 'taxiway'))
+                       WHERE way && !bbox!
+                         AND (highway IN ('motorway', 'trunk', 'primary', 'secondary', 'tertiary', 'unclassified', 'residential') OR aeroway IN ('runway', 'taxiway'))
                          AND ref IS NOT NULL AND ref LIKE '%;%'
              ) AS query
            ) AS query2
