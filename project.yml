@@ -43,7 +43,7 @@ Stylesheet:
   - bg.mss
   - road.mss
   - label.mss
-#  - poi_classic.mss
+  - poi_classic.mss
   - hdm.mss
 
 
@@ -51,10 +51,10 @@ Stylesheet:
 
 Layer:
 
-#  - landcover
   - <<: *layer
     name: landuse
     id:   landuse
+    geometry: "polygon"
     Datasource:
       <<: *postgis
       geometry_field: way
@@ -81,13 +81,16 @@ Layer:
                  ELSE '' END as class
           FROM planet_osm_polygon
           WHERE way && !bbox!
-            AND landuse IS NOT NULL
+            AND (landuse IS NOT NULL
             OR  leisure IS NOT NULL
-            OR "natural" IS NOT NULL
+            OR "natural" IS NOT NULL)
         ) AS _
   - <<: *layer
     name: site
     id:   site
+    geometry: "polygon"
+    properties:
+      minzoom: 12
     Datasource:
       <<: *postgis
       geometry_field: way
@@ -105,17 +108,20 @@ Layer:
                  ELSE '' END as class
           FROM planet_osm_polygon
           WHERE way && !bbox!
-            AND amenity = 'shelter'
+            AND (amenity = 'shelter'
             OR landuse IN ('residential','brownfield')
             OR tags->'shelter' = 'yes'
             OR tags->'refugee' = 'yes'
             OR tags->'idp:camp_site' = 'spontaneous_camp'
             OR leisure = 'common'
-            OR tags->'hazard' = 'landslide'
+            OR tags->'hazard' = 'landslide')
         ) AS _
   - <<: *layer
     name: site_line
     id:   site_line
+    geometry: "linestring"
+    properties:
+      minzoom: 12
     Datasource:
       <<: *postgis
       geometry_field: way
@@ -133,17 +139,18 @@ Layer:
                  ELSE '' END as class
           FROM planet_osm_line
           WHERE way && !bbox!
-            AND amenity = 'shelter'
+            AND (amenity = 'shelter'
             OR landuse IN ('residential','brownfield')
             OR tags->'shelter' = 'yes'
             OR tags->'refugee' = 'yes'
             OR tags->'idp:camp_site' = 'spontaneous_camp'
             OR leisure = 'common'
-            OR tags->'hazard' = 'landslide'
+            OR tags->'hazard' = 'landslide')
         ) AS _
   - <<: *layer
     name: waterway
     id:   waterway
+    geometry: "linestring"
     Datasource:
       <<: *postgis
       geometry_field: way
@@ -160,6 +167,7 @@ Layer:
   - <<: *layer
     name: water
     id:   water
+    geometry: "polygon"
     Datasource:
       <<: *postgis
       geometry_field: way
@@ -177,15 +185,17 @@ Layer:
   - <<: *layer
     name: coastline_water
     id:   coastline_water
+    geometry: "polygon"
     Datasource:
       <<: *shapefile
       file: shp/water_polygons.shp
-
 #  - barrier_line
-#  - building
   - <<: *layer
     name: building
     id:   building
+    properties:
+      minzoom: 12
+    geometry: "polygon"
     Datasource:
       <<: *postgis
       geometry_field: way
@@ -202,6 +212,9 @@ Layer:
   - <<: *layer
     name: building_condition
     id:   building_condition
+    properties:
+      minzoom: 12
+    geometry: "polygon"
     Datasource:
       <<: *postgis
       geometry_field: way
@@ -217,13 +230,15 @@ Layer:
                  ELSE '' END as class
           FROM planet_osm_polygon
           WHERE way && !bbox!
-            AND building IN ('construction','collapsed','collapse')
-            OR tags->'damage' IN ('moderate','extensive','severe','total','destroyed','collapsed','collapse','partially_collapsed','flooded')
+            AND (building IN ('construction','collapsed','collapse')
+            OR tags->'damage' IN ('moderate','extensive','severe','total','destroyed','collapsed','collapse','partially_collapsed','flooded'))
         ) AS _
-#  - landuse_overlay
   - <<: *layer
     name: landuse_overlay
     id:   landuse_overlay
+    geometry: "polygon"
+    properties:
+      minzoom: 10
     Datasource:
       <<: *postgis
       geometry_field: way
@@ -237,13 +252,16 @@ Layer:
                  ELSE '' END as class
           FROM planet_osm_polygon
           WHERE way && !bbox!
-          AND "natural" IN ('wetland','marsh','swamp','bog','mud','tidalflat')
-          OR wetland IN ('wetland','marsh','swamp','bog','mud','tidalflat')
+          AND ("natural" IN ('wetland','marsh','swamp','bog','mud','tidalflat')
+          OR wetland IN ('wetland','marsh','swamp','bog','mud','tidalflat'))
         ) AS _
 #  - tunnel
   - <<: *layer
     name: road
     id:   road
+    geometry: "linestring"
+    properties:
+      minzoom: 8
     Datasource:
       <<: *postgis
       geometry_field: way
@@ -257,13 +275,16 @@ Layer:
             aerialway
           FROM planet_osm_line
           WHERE way && !bbox!
-          AND highway IN ('motorway','motorway_link','trunk','trunk_link','primary','primary_link','secondary','secondary_link','tertiary','tertiary_link','road','path','track','service','footway','bridleway','cycleway','steps','pedestrian','living_street','unclassified','residential','raceway')
-          OR aerialway IN ('chair_lift','mixed_lift','drag_lift','platter','t-bar','magic_carpet','gondola','cable_car','rope_tow','zip_line','j-bar','canopy')
+          AND (highway IN ('motorway','motorway_link','trunk','trunk_link','primary','primary_link','secondary','secondary_link','tertiary','tertiary_link','road','path','track','service','footway','bridleway','cycleway','steps','pedestrian','living_street','unclassified','residential','raceway')
+          OR aerialway IN ('chair_lift','mixed_lift','drag_lift','platter','t-bar','magic_carpet','gondola','cable_car','rope_tow','zip_line','j-bar','canopy'))
         ) AS _
 #  - bridge
   - <<: *layer
     name: road_condition
     id:   road_condition
+    geometry: "linestring"
+    properties:
+      minzoom: 12
     Datasource:
       <<: *postgis
       geometry_field: way
@@ -271,20 +292,23 @@ Layer:
         (
           SELECT
             way,
-            name,
+            name as barrier,
             CASE WHEN military = 'checkpoint' OR barrier = 'checkpoint' THEN 'checkpoint'
                  WHEN barrier = 'debris' THEN 'debris'
                  WHEN barrier = 'gate' THEN 'gate'
                  ELSE '' END as class
           FROM planet_osm_point
           WHERE way && !bbox!
-            AND barrier IN ('checkpoint', 'debris','gate')
-            OR military = 'checkpoint'
+            AND (barrier IN ('checkpoint', 'debris','gate')
+            OR military = 'checkpoint')
         ) AS _
 #  - aeroway
   - <<: *layer
     name: sanitation
     id:   sanitation
+    geometry: "point"
+    properties:
+      minzoom: 12
     Datasource:
       <<: *postgis
       geometry_field: way
@@ -299,14 +323,17 @@ Layer:
                  ELSE '' END as class
           FROM planet_osm_point
           WHERE way && !bbox!
-            AND amenity IN ('shower', 'toilets','waste_disposal','waste_basket','sanitary_dump_station')
+            AND (amenity IN ('shower', 'toilets','waste_disposal','waste_basket','sanitary_dump_station')
             OR landuse = 'landfill'
             OR man_made = 'wastewater_plant'
-            OR tags->'informal' = 'dumpsite'
+            OR tags->'informal' = 'dumpsite')
         ) AS _
   - <<: *layer
     name: sanitation_poly
     id:   sanitation_poly
+    geometry: "polygon"
+    properties:
+      minzoom: 12
     Datasource:
       <<: *postgis
       geometry_field: way
@@ -321,14 +348,17 @@ Layer:
                  ELSE '' END as class
           FROM planet_osm_polygon
           WHERE way && !bbox!
-            AND amenity IN ('shower', 'toilets','waste_disposal','waste_basket','sanitary_dump_station')
+            AND (amenity IN ('shower', 'toilets','waste_disposal','waste_basket','sanitary_dump_station')
             OR landuse = 'landfill'
             OR man_made = 'wastewater_plant'
-            OR tags->'informal' = 'dumpsite'
+            OR tags->'informal' = 'dumpsite')
         ) AS _
   - <<: *layer
     name: water_source
     id:   water_source
+    geometry: "polygon"
+    properties:
+      minzoom: 10
     Datasource:
       <<: *postgis
       geometry_field: way
@@ -352,13 +382,16 @@ Layer:
                  ELSE '' END as pump
           FROM planet_osm_polygon
           WHERE way && !bbox!
-            AND man_made IN ('water_well', 'water_tower','storage_tank','water_tank')
+            AND (man_made IN ('water_well', 'water_tower','storage_tank','water_tank')
             OR "natural" = 'spring'
-            OR amenity = 'drinking_water'
+            OR amenity = 'drinking_water')
         ) AS _
   - <<: *layer
     name: emergency
     id:   emergency
+    geometry: "point"
+    properties:
+      minzoom: 10
     Datasource:
       <<: *postgis
       geometry_field: way
@@ -378,14 +411,17 @@ Layer:
                  ELSE '' END as class
           FROM planet_osm_point
           WHERE way && !bbox!
-            AND tags->'emergency' IN ('ambulance_station','defibrillator','aed','fire_extinguisher','fire_hydrant','fire_hose','fire_flapper','assembly_point','access_point','phone','siren','landing_site')
+            AND (tags->'emergency' IN ('ambulance_station','defibrillator','aed','fire_extinguisher','fire_hydrant','fire_hose','fire_flapper','assembly_point','access_point','phone','siren','landing_site')
             OR tags->'medical' = 'aed'
             OR tags->'emergency:helipad' = 'potential'
-            OR aeroway = 'helipad'
+            OR aeroway = 'helipad')
         ) AS _
   - <<: *layer
     name: emergency_poly
     id:   emergency_poly
+    geometry: "polygon"
+    properties:
+      minzoom: 10
     Datasource:
       <<: *postgis
       geometry_field: way
@@ -405,14 +441,17 @@ Layer:
                  ELSE '' END as class
           FROM planet_osm_polygon
           WHERE way && !bbox!
-            AND tags->'emergency' IN ('ambulance_station','defibrillator','aed','fire_extinguisher','fire_hydrant','fire_hose','fire_flapper','assembly_point','access_point','phone','siren','landing_site')
+            AND (tags->'emergency' IN ('ambulance_station','defibrillator','aed','fire_extinguisher','fire_hydrant','fire_hose','fire_flapper','assembly_point','access_point','phone','siren','landing_site')
             OR tags->'medical' = 'aed'
             OR tags->'emergency:helipad' = 'potential'
-            OR aeroway = 'helipad'
+            OR aeroway = 'helipad')
         ) AS _
   - <<: *layer
     name: medical
     id:   medical
+    geometry: "polygon"
+    properties:
+      minzoom: 10
     Datasource:
       <<: *postgis
       geometry_field: way
@@ -430,13 +469,16 @@ Layer:
                  ELSE '' END as class
           FROM planet_osm_polygon
           WHERE way && !bbox!
-            AND amenity IN ('hospital', 'clinic','pharmacy','mortuary')
+            AND (amenity IN ('hospital', 'clinic','pharmacy','mortuary')
             OR tags->'health_facility_type' IN ('field_hospital', 'dispensary')
-            OR tags->'health_facility:type' IN ('field_hospital', 'dispensary')
+            OR tags->'health_facility:type' IN ('field_hospital', 'dispensary'))
         ) AS _
   - <<: *layer
     name: communication
     id:   communication
+    geometry: "point"
+    properties:
+      minzoom: 12
     Datasource:
       <<: *postgis
       geometry_field: way
@@ -451,14 +493,17 @@ Layer:
                  ELSE '' END as class
           FROM planet_osm_point
           WHERE way && !bbox!
-            AND man_made IN ('communications_tower', 'communications_dish')
+            AND (man_made IN ('communications_tower', 'communications_dish')
             OR amenity = 'community_information_kiosk'
             OR "tower:type" = 'communication'
-            OR tags->'board_type' = 'notice'
+            OR tags->'board_type' = 'notice')
         ) AS _
   - <<: *layer
     name: electric_utility
     id:   electric_utility
+    geometry: "point"
+    properties:
+      minzoom: 12
     Datasource:
       <<: *postgis
       geometry_field: way
@@ -483,6 +528,9 @@ Layer:
   - <<: *layer
     name: electric_utility_line
     id:   electric_utility_line
+    geometry: "linestring"
+    properties:
+      minzoom: 12
     Datasource:
       <<: *postgis
       geometry_field: way
@@ -507,6 +555,9 @@ Layer:
   - <<: *layer
     name: electric_utility_poly
     id:   electric_utility_poly
+    geometry: "polygon"
+    properties:
+      minzoom: 12
     Datasource:
       <<: *postgis
       geometry_field: way
@@ -537,6 +588,9 @@ Layer:
   - <<: *layer
     id: place_label
     name: place_label
+    properties:
+      minzoom: 8
+    geometry: "point"
     Datasource:
       <<: *postgis
       table: |-
@@ -568,12 +622,31 @@ Layer:
 #  - water_label
 #  - poi_label
 #  - hdm_label
-#  - road_label
   - <<: *layer
-    id: "roads-text-ref"
-    name: "roads-text-ref"
+    id: road_label
+    name: road_label
+    geometry: "linestring"
+    properties:
+      minzoom: 12
+    Datasource:
+      <<: *postgis
+      table: |-
+        (SELECT way, osm_id, name,
+            highway as class,
+            ST_Length(way) as len
+            FROM planet_osm_line
+            WHERE
+            way && !bbox!
+            AND highway IS NOT NULL
+            AND name IS NOT NULL
+        ) AS data
+  - <<: *layer
+    id: roads-text-ref
+    name: roads-text-ref
     class: ""
     geometry: "linestring"
+    properties:
+      minzoom: 10
     Datasource:
       <<: *postgis
       table: |-
@@ -612,4 +685,28 @@ Layer:
        GROUP BY way, highway, orig_ref, refs) as innerquery
        --WHERE height <= 4 AND width <= 11) as roads_text_ref
 #  - waterway_label
-#  - housenum_label
+  - <<: *layer
+    id: housenum_label
+    name: housenum_label
+    geometry: "point"
+    properties:
+      minzoom: 18
+    Datasource:
+      <<: *postgis
+      table: |-
+        (SELECT way, osm_id, house_num
+          FROM
+          (
+            SELECT way, osm_id, "addr:housenumber" as house_num
+            FROM planet_osm_point
+            WHERE
+            way && !bbox!
+            AND "addr:housenumber" IS NOT NULL
+            UNION ALL
+            SELECT ST_Centroid(way) as way, osm_id, "addr:housenumber" as house_num
+            FROM planet_osm_polygon
+            WHERE
+            way && !bbox!
+            AND "addr:housenumber" IS NOT NULL
+          ) AS housenumbers
+        ) AS data

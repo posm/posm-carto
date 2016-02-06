@@ -287,12 +287,21 @@
 }
 
 // regular labels
-#road_label['mapnik::geometry_type'=2] {
-  ::motorway [class='motorway'][zoom>=12],
-  ::main [class='main'][zoom>=12],
-  ::streetFar [class='street'][zoom<=14][len>2500],
-  ::streetNear [class='street'][zoom>=15],
-  ::street_limited [class='street_limited'] {
+//#road_label['mapnik::geometry_type'=2] {
+#road_label {
+  [class='motorway'][zoom>=12],
+  [class='trunk'][zoom>=12],
+  [class='primary'][zoom>=12],
+  [class='secondary'][zoom<=14],
+  [class='tertiary'][zoom<=14],
+  [class='residential'][zoom>=15],
+  [class='path'][zoom>=16],
+  [class='service'][zoom>=16],
+  [class='footway'][zoom>=16],
+  [class='unclassified'][zoom>=16],
+  [class='cycleway'][zoom>=16],
+  [class='living_street'][zoom>=16],
+  [class='road'][zoom>=16] {
     text-avoid-edges: true;
     text-transform: uppercase;
     text-name: @name;
@@ -309,39 +318,12 @@
     [zoom>=16] { text-size: 11; }
     [zoom>=18] { text-size: 12; }
     [class='motorway'],
-    [class='main'] {
+    [class='trunk'],
+    [class='primary'] {
       [zoom>=14] { text-size: 10; }
       [zoom>=16] { text-size: 11; text-face-name: @sans_bold; }
       [zoom>=17] { text-size: 12; }
       [zoom>=18] { text-size: 14; }
-    }
-  }
-}
-
-// less prominent labels for all other types, by length
-#road_label {
-  ::0 [len>10000][zoom>=12],
-  ::1 [len>5000][zoom>=13],
-  ::2 [len>2500][zoom>=14],
-  ::3 [len>1200][zoom>=15],
-  ::4 [len>0][zoom>=16] {
-    ['mapnik::geometry_type'=2]
-    [class!='motorway']
-    [class!='main']
-    [class!='street']
-    [class!='street_limited'] {
-      text-avoid-edges: true;
-      text-name: @name;
-      text-character-spacing: 0.25;
-      text-placement: line;
-      text-face-name: @sans;
-      text-fill: #666;
-      text-size: 9;
-      text-halo-fill: @road_halo;
-      text-halo-radius: 1.5;
-      text-min-distance: 200; // only for labels w/ the same name
-      [zoom>=17] { text-size: 10; }
-      [zoom>=18] { text-size: 11; }
     }
   }
 }

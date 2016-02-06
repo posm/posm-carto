@@ -40,7 +40,7 @@ clean:
 
 .PRECIOUS: %.xml
 
-%.xml: %.mml db/shapefiles
+%.xml: %.mml db/shapefiles db/fonts
 	@echo
 	@echo Building $@
 	@echo
@@ -92,6 +92,34 @@ shp/%.shx: data/%.zip
 
 shp/water_polygons.index: shp/water_polygons.shp
 	node_modules/.bin/mapnik-shapeindex.js $<
+
+.PHONY: db/fonts
+
+db/fonts: fonts/NotoSans-Regular.ttf \
+	fonts/unifont-Medium.ttf \
+	fonts/DejaVuSans.ttf
+
+fonts/%.ttf: fonts/%.zip
+	unzip -ju $< -d $$(dirname $@)
+
+fonts/NotoSans-Regular.zip:
+	@mkdir -p $$(dirname $@)
+	curl -Lf https://noto-website.storage.googleapis.com/pkgs/Noto-unhinted.zip -o $@
+
+#fonts/OpenSans-Regular.zip:
+	#@mkdir -p $$(dirname $@)
+	#curl -Lf http://sourceforge.net/projects/dejavu/files/dejavu/2.35/dejavu-fonts-ttf-2.35.zip -o $@
+
+#fonts/unifont-Medium.zip:
+fonts/unifont-Medium.ttf:
+	@mkdir -p $$(dirname $@)
+	curl -Lf http://unifoundry.com/pub/unifont-8.0.01/font-builds/unifont-8.0.01.ttf -o $@
+
+fonts/DejaVuSans.zip:
+	@mkdir -p $$(dirname $@)
+	curl -Lf http://sourceforge.net/projects/dejavu/files/dejavu/2.35/dejavu-fonts-ttf-2.35.zip -o $@
+
+
 
 # complete wrapping
 else

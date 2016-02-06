@@ -6,16 +6,15 @@
 // FONTS
 // =====================================================================
 
-font-directory: url("fonts/");
 
 // Language
 @name: '[name]';
 
 // set up font sets for various weights and styles
-@sans:              "Noto Sans Regular";
-@sans_italic:       "Noto Sans Italic";
-@sans_bold:         "Noto Sans Bold";
-@sans__bold_italic: "Noto Sans Bold Italic";
+@sans: "DejaVu Sans", "Noto Sans Regular", "unifont Medium", "Unifont Medium";
+@sans_italic: "DejaVu Sans Oblique", "Noto Sans Regular", "unifont Medium", "Unifont Medium";
+@sans_bold: "DejaVu Sans Bold", "Noto Sans Bold", "unifont Medium", "Unifont Medium";
+@sans_bold_italic: "DejaVu Sans Bold Oblique", "Noto Sans Bold Italic", "unifont Medium", "Unifont Medium";
 
 // =====================================================================
 // LANDUSE & LANDCOVER COLORS

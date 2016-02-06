@@ -1,6 +1,6 @@
 Map { 
   background-color: @land;
-  font-directory: url('font');
+  font-directory: url('fonts/');
 }
 
 // =====================================================================
