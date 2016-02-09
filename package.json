@@ -1,7 +1,11 @@
 {
-  "name": "posm-simple",
+  "name": "posm-carto",
   "version": "1.0.0",
   "description": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AmericanRedCross/posm-carto"
+  },
   "main": "index.js",
   "scripts": {
     "start": "(set -a && source .env && make project.xml) && tessera mapnik://./project.xml"
