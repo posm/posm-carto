@@ -69,6 +69,7 @@ Layer:
                  WHEN leisure = 'pitch' THEN 'pitch'
                  WHEN leisure IN ('playground','recreation_ground') THEN 'playground'
                  WHEN leisure = 'stadium' THEN 'stadium'
+                 WHEN amenity = 'parking' THEN 'parking'
                  WHEN landuse = 'cemetery' THEN 'cemetery'
                  WHEN landuse = 'industrial' THEN 'industrial'
                  WHEN landuse IN ('farmland','farm','farmyard','orchard') THEN 'agriculture'
@@ -83,6 +84,7 @@ Layer:
           WHERE way && !bbox!
             AND (landuse IS NOT NULL
             OR  leisure IS NOT NULL
+            OR  amenity = 'parking'
             OR "natural" IS NOT NULL)
         ) AS _
   - <<: *layer
