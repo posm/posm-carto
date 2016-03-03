@@ -163,10 +163,19 @@
         line-join: miter; 
         line-cap: butt; }
     }
+    [type='steps'][zoom>=14] {
+      line-color: @path_line;
+      line-opacity: 0.7;
+      line-dasharray: 1.5, 0.5;
+      line-width: 1.4;
+      [zoom>=15] { line-width: 1.9; line-dasharray: 2, 0.75; }
+      [zoom>=16] { line-width: 2.5; line-dasharray: 3, 1; }
+    }
+    [type='footway'][zoom>=14],
     [type='path'][zoom>=14] {
       line-color: @path_line;
       line-opacity: 0.7;
-      line-dasharray: 6 , 1.5;
+      line-dasharray: 6, 1.5;
       line-width: 0.75;
       [zoom>=15] { line-width: 0.9; line-dasharray: 7, 2.5; }
       [zoom>=16] { line-width: 1.4; line-dasharray: 8, 3; }
