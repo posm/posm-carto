@@ -175,11 +175,16 @@ Layer:
         (
           SELECT
             way,
-            name
+            name,
+            CASE WHEN water IS NOT NULL THEN water
+                 WHEN landuse = 'reservoir' THEN 'reservoir'
+                 WHEN waterway = 'riverbank' THEN 'riverbank'
+                 ELSE 'water' END as class
           FROM planet_osm_polygon
           WHERE way && !bbox!
           AND water IS NOT NULL
           OR landuse = 'reservoir'
+          OR waterway = 'riverbank'
           OR "natural" = 'water'
         ) AS _
   - <<: *layer
