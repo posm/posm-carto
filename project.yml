@@ -190,6 +190,13 @@ Layer:
           OR "natural" = 'water'
         ) AS _
   - <<: *layer
+    name: coastline_water
+    id:   coastline_water
+    geometry: "polygon"
+    Datasource:
+      <<: *shapefile
+      file: shp/water_polygons.shp
+  - <<: *layer
     name: water_features
     id:   water_features
     geometry: "polygon"
@@ -212,13 +219,6 @@ Layer:
           WHERE way && !bbox!
           AND man_made IN ('pier', 'breakwater', 'groyne')
         ) AS _
-  - <<: *layer
-    name: coastline_water
-    id:   coastline_water
-    geometry: "polygon"
-    Datasource:
-      <<: *shapefile
-      file: shp/water_polygons.shp
   - <<: *layer
     name: barrier_line
     id:   barrier_line
