@@ -264,6 +264,38 @@ Layer:
           OR barrier IN ('hedge', 'fence', 'gate'))
         ) AS _
   - <<: *layer
+    name: aeroway
+    id:   aeroway
+    geometry: "polygon"
+    Datasource:
+      <<: *postgis
+      geometry_field: way
+      table: >
+        (
+          SELECT
+            way,
+            name,
+            aeroway as type
+          FROM planet_osm_line
+          WHERE way && !bbox!
+            AND aeroway IN ('runway','taxiway')
+          UNION ALL
+          SELECT
+            way,
+            name,
+            aeroway as type
+          FROM planet_osm_polygon
+          WHERE way && !bbox!
+            AND aeroway IN ('aerodrome','runway','taxiway','helipad','apron')
+        ) AS _
+          ORDER BY CASE
+            WHEN type = 'aerodrome' THEN 1
+            WHEN type = 'apron' THEN 2
+            WHEN type = 'taxiway' THEN 3
+            WHEN type = 'runway' THEN 4
+            WHEN type = 'helipad' THEN 5
+          END ASC
+  - <<: *layer
     name: building
     id:   building
     properties:
@@ -277,10 +309,12 @@ Layer:
           SELECT
             way,
             name,
-            building as type
+            CASE WHEN building IS NOT NULL THEN building
+                 ELSE aeroway END AS type
           FROM planet_osm_polygon
           WHERE way && !bbox!
-          AND building IS NOT NULL
+          AND (building IS NOT NULL
+          OR aeroway IN ('terminal','hangar'))
         ) AS _
   - <<: *layer
     name: building_condition
@@ -467,7 +501,6 @@ Layer:
             AND (barrier IN ('checkpoint', 'debris','gate')
             OR military = 'checkpoint')
         ) AS _
-#  - aeroway
   - <<: *layer
     name: sanitation
     id:   sanitation

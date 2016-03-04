@@ -227,12 +227,27 @@ Map {
 // AEROWAYS
 // =====================================================================
 
-// lines
-#aeroway['mapnik::geometry_type'=2][zoom>9] {
+// polygons other than runways/taxiways
+#aeroway['mapnik::geometry_type'=3][zoom>=12] {
+  polygon-fill: lighten(@aeroway, 40%);
+  line-color: #555;
+  line-width: 0.5;
+  [type='apron'] {
+    polygon-fill: lighten(@parking,20%);
+    polygon-opacity: 0.5;
+  }
+}
+
+// lines and polygon runways/taxiways
+#aeroway[zoom>9] {
+    ['mapnik::geometry_type'=3][type='runway'],
+    ['mapnik::geometry_type'=3][type='taxiway'] {
+      polygon-fill:darken(@aeroway, 40);
+    }
     line-color:darken(@aeroway, 40);
     line-cap:butt;
     line-join:miter;
-    [type='runway'] {
+    ['mapnik::geometry_type'=2][type='runway'] {
       [zoom=10]{ line-width:1; }
       [zoom=11]{ line-width:1.5; }
       [zoom=12]{ line-width:2; }
@@ -242,7 +257,7 @@ Map {
       [zoom=16]{ line-width:10; }
       [zoom>=17]{ line-width:12; }
     }
-    [type='taxiway'] {
+    ['mapnik::geometry_type'=2][type='taxiway'] {
       [zoom<13]{ line-width:0.2; }
       [zoom=13]{ line-width:1; }
       [zoom=14]{ line-width:1.5; }
@@ -251,19 +266,6 @@ Map {
       [zoom>=17]{ line-width:4; }
     }
 }
-
-
-// polygons
-#aeroway['mapnik::geometry_type'=3][zoom>=12] {
-  polygon-fill: lighten(@aeroway, 40%);
-  line-color: #555;
-  line-width: 0.5;
-  [type='apron'] {
-    polygon-fill: @parking;
-    polygon-opacity: 0.8;
-  }
-}
-
 
 // =====================================================================
 // BUILDINGS
