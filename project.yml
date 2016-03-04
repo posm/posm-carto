@@ -220,6 +220,31 @@ Layer:
           AND man_made IN ('pier', 'breakwater', 'groyne')
         ) AS _
   - <<: *layer
+    name: water_barriers
+    id:   water_barriers
+    geometry: "polygon"
+    Datasource:
+      <<: *postgis
+      geometry_field: way
+      table: >
+        (
+          SELECT
+            way,
+            name,
+            waterway
+          FROM planet_osm_line
+          WHERE way && !bbox!
+          AND waterway IN ('dam', 'weir', 'lock_gate')
+          UNION ALL
+          SELECT
+            way,
+            name,
+            waterway
+          FROM planet_osm_polygon
+          WHERE way && !bbox!
+          AND waterway IN ('dam', 'weir', 'lock_gate')
+        ) AS _
+  - <<: *layer
     name: barrier_line
     id:   barrier_line
     geometry: "linestring"

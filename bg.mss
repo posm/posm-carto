@@ -328,6 +328,17 @@ Map {
   [zoom>=16] { line-pattern-file: url(img/pattern/cliff-lg.png); }
 }
 
+#water_barriers {
+  line-color: @dam-line;
+  line-width: 2;
+  line-join: round;
+  line-cap: round;
+
+  ['mapnik::geometry_type'=3] {
+    polygon-fill: @dam;
+  }
+}
+
 // =====================================================================
 // ADMINISTRATIVE BOUNDARIES
 // =====================================================================
