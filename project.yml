@@ -303,10 +303,9 @@ Layer:
           AND ("natural" IN ('wetland','marsh','swamp','bog','mud','tidalflat')
           OR wetland IN ('wetland','marsh','swamp','bog','mud','tidalflat'))
         ) AS _
-#  - tunnel
   - <<: *layer
-    name: road
-    id:   road
+    name: tunnel
+    id:   tunnel
     geometry: "linestring"
     properties:
       minzoom: 8
@@ -319,14 +318,88 @@ Layer:
             way,
             name,
             highway as type,
-            access,
-            aerialway
+            access
           FROM planet_osm_line
           WHERE way && !bbox!
-          AND (highway IN ('motorway','motorway_link','trunk','trunk_link','primary','primary_link','secondary','secondary_link','tertiary','tertiary_link','road','path','track','service','footway','bridleway','cycleway','steps','pedestrian','living_street','unclassified','residential','raceway')
-          OR aerialway IN ('chair_lift','mixed_lift','drag_lift','platter','t-bar','magic_carpet','gondola','cable_car','rope_tow','zip_line','j-bar','canopy'))
+          AND (tunnel = 'yes' OR tunnel = 'building_massage' OR covered = 'yes')
+          AND highway IN ('motorway','motorway_link','trunk','trunk_link','primary','primary_link','secondary','secondary_link','tertiary','tertiary_link','road','path','track','service','footway','bridleway','cycleway','steps','pedestrian','living_street','unclassified','residential','raceway')
         ) AS _
-#  - bridge
+  - <<: *layer
+    name: road
+    id:   road
+    geometry: "linestring"
+    properties:
+      minzoom: 8
+    Datasource:
+      <<: *postgis
+      geometry_field: way
+      table: >
+        (
+          SELECT * FROM (
+            SELECT
+              way,
+              name,
+              highway as type,
+              access,
+              aerialway
+            FROM planet_osm_line
+            WHERE way && !bbox!
+            AND (tunnel IS NULL OR NOT tunnel IN ('yes', 'building_passage'))
+            AND (covered IS NULL OR NOT covered = 'yes')
+            AND (bridge IS NULL OR NOT bridge IN ('yes', 'boardwalk', 'cantilever', 'covered', 'low_water_crossing', 'movable', 'trestle', 'viaduct'))
+            AND (highway IN ('motorway','motorway_link','trunk','trunk_link','primary','primary_link','secondary','secondary_link','tertiary','tertiary_link','road','path','track','service','footway','bridleway','cycleway','steps','pedestrian','living_street','unclassified','residential','raceway')
+            OR aerialway IN ('chair_lift','mixed_lift','drag_lift','platter','t-bar','magic_carpet','gondola','cable_car','rope_tow','zip_line','j-bar','canopy'))
+          ) AS features
+          JOIN (VALUES
+              ('motorway', 380),
+              ('trunk', 370),
+              ('primary', 360),
+              ('secondary', 350),
+              ('tertiary', 340),
+              ('residential', 330),
+              ('unclassified', 330),
+              ('road', 330),
+              ('living_street', 320),
+              ('pedestrian', 310),
+              ('raceway', 300),
+              ('motorway_link', 240),
+              ('trunk_link', 230),
+              ('primary_link', 220),
+              ('secondary_link', 210),
+              ('tertiary_link', 200),
+              ('service', 150),
+              ('track', 110),
+              ('path', 100),
+              ('footway', 100),
+              ('bridleway', 100),
+              ('cycleway', 100),
+              ('steps', 100)
+            ) AS ordertable (type, prio)
+            USING (type)
+          ORDER BY
+            prio
+        ) AS _
+  - <<: *layer
+    name: bridge
+    id:   bridge
+    geometry: "linestring"
+    properties:
+      minzoom: 8
+    Datasource:
+      <<: *postgis
+      geometry_field: way
+      table: >
+        (
+          SELECT
+            way,
+            name,
+            highway as type,
+            access
+          FROM planet_osm_line
+          WHERE way && !bbox!
+          AND bridge IN ('yes', 'boardwalk', 'cantilever', 'covered', 'low_water_crossing', 'movable', 'trestle', 'viaduct')
+          AND highway IN ('motorway','motorway_link','trunk','trunk_link','primary','primary_link','secondary','secondary_link','tertiary','tertiary_link','road','path','track','service','footway','bridleway','cycleway','steps','pedestrian','living_street','unclassified','residential','raceway')
+        ) AS _
   - <<: *layer
     name: road_condition
     id:   road_condition
