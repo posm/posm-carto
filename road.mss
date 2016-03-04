@@ -32,6 +32,11 @@
   line-width: 3;
 }
 */
+#road_area[zoom>=12] {
+  polygon-fill: @fillStreet;
+  line-color: @caseStreet;
+  line-width: 1;
+}
 
 // Roads are split across 3 layers: #road, #bridge, and #tunnel. Each
 // road segment will only exist in one of the three layers. The
@@ -150,6 +155,7 @@
       [zoom>=16] { line-width:5.5; }
     }
     [type='service'][zoom>=10],
+    [type='pedestrian'][zoom>=12],
     [type='track'][zoom>=10] {
       #tunnel { line-opacity: 0.2; }
       line-color: @caseStreet;
@@ -264,6 +270,7 @@
       [zoom>=16] { line-width:3.5; }
     }
     [type='service'][zoom>=14],
+    [type='pedestrian'][zoom>=12],
     [type='track'][zoom>=14] {
       line-color:@fillStreet;
       line-width:0;

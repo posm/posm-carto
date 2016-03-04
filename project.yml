@@ -325,6 +325,25 @@ Layer:
           AND highway IN ('motorway','motorway_link','trunk','trunk_link','primary','primary_link','secondary','secondary_link','tertiary','tertiary_link','road','path','track','service','footway','bridleway','cycleway','steps','pedestrian','living_street','unclassified','residential','raceway')
         ) AS _
   - <<: *layer
+    name: road_area
+    id:   road_area
+    geometry: "polygon"
+    properties:
+      minzoom: 10
+    Datasource:
+      <<: *postgis
+      geometry_field: way
+      table: >
+        (
+          SELECT
+            way,
+            name,
+            highway as type
+          FROM planet_osm_polygon
+          WHERE way && !bbox!
+          AND highway IN ('pedestrian','footway','service','residential')
+        ) AS _
+  - <<: *layer
     name: road
     id:   road
     geometry: "linestring"
