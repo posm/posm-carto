@@ -87,6 +87,20 @@ Map {
 }
 
 // =====================================================================
+// WATER FEATURES
+// =====================================================================
+
+#water_features {
+  ['mapnik::geometry_type'=2] {
+    line-color: @land;
+    line-width: 4;
+  }
+  ['mapnik::geometry_type'=3] {
+    polygon-fill: @land;
+  }
+}
+
+// =====================================================================
 // LANDUSE
 // =====================================================================
 
@@ -309,28 +323,10 @@ Map {
   [zoom>18] { line-width: 1.6; }
 }
 
-#barrier_line[zoom>=13][class='land'] {
-  ['mapnik::geometry_type'=2][zoom>=14] {
-    // These shouldn't be scaled based on pixel scaling
-    line-color:@land;
-    [zoom=14] { line-width: 0.75; }
-    [zoom=15] { line-width: 1.5; }
-    [zoom=16] { line-width: 3; }
-    [zoom=17] { line-width: 6; }
-    [zoom=18] { line-width: 12; }
-    [zoom=19] { line-width: 24; }
-    [zoom>19] { line-width: 48; }
-  }
-  ['mapnik::geometry_type'=3] {
-    polygon-fill:@land;
-  }
-}
-
 #barrier_line[zoom>=14][class='cliff'] {
   line-pattern-file: url(img/pattern/cliff-md.png);
   [zoom>=16] { line-pattern-file: url(img/pattern/cliff-lg.png); }
 }
-
 
 // =====================================================================
 // ADMINISTRATIVE BOUNDARIES

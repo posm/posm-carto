@@ -190,13 +190,54 @@ Layer:
           OR "natural" = 'water'
         ) AS _
   - <<: *layer
+    name: water_features
+    id:   water_features
+    geometry: "polygon"
+    Datasource:
+      <<: *postgis
+      geometry_field: way
+      table: >
+        (
+          SELECT
+            way,
+            man_made
+          FROM planet_osm_line
+          WHERE way && !bbox!
+          AND man_made IN ('pier', 'breakwater', 'groyne')
+          UNION ALL
+          SELECT
+            way,
+            man_made
+          FROM planet_osm_polygon
+          WHERE way && !bbox!
+          AND man_made IN ('pier', 'breakwater', 'groyne')
+        ) AS _
+  - <<: *layer
     name: coastline_water
     id:   coastline_water
     geometry: "polygon"
     Datasource:
       <<: *shapefile
       file: shp/water_polygons.shp
-#  - barrier_line
+  - <<: *layer
+    name: barrier_line
+    id:   barrier_line
+    geometry: "linestring"
+    Datasource:
+      <<: *postgis
+      geometry_field: way
+      table: >
+        (
+          SELECT
+            way,
+            name,
+            CASE WHEN barrier IS NOT NULL THEN barrier
+                 ELSE 'cliff' END AS class
+          FROM planet_osm_line
+          WHERE way && !bbox!
+          AND ("natural" = 'cliff'
+          OR barrier IN ('hedge', 'fence', 'gate'))
+        ) AS _
   - <<: *layer
     name: building
     id:   building
