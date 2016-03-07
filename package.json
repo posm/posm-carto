@@ -17,8 +17,8 @@
     "interp": "^0.1.1",
     "js-yaml": "^3.4.6",
     "pgexplode": "^1.0.1",
-    "tessera": "^0.6.0",
-    "mapnik": "^3.4.16",
+    "tessera": "^0.8.0",
+    "mapnik": "^3.5.2",
     "tilelive-mapnik": "^0.6.17"
   }
 }
