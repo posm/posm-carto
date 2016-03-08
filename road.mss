@@ -282,28 +282,32 @@
         line-join: miter; 
         line-cap: butt; }
     }
-/*
-// TODO: revisit this
-    [class='major_rail'] {
-      line-width: 0.9;
-      line-color: #444;
-      line-opacity: 0.6;
-       // Hatching
-       h/line-width: 2.5;
-       h/line-color: #444;
-       h/line-dasharray: 1,8;
-       h/line-opacity: 0.6;
-      [zoom>=16] {
-        
-        line-width: 1.5;
-        line-color: #444;
-        
-      	// Hatching
-      	h/line-width: 8;
-      	h/line-color: #444;
-      	h/line-dasharray: 1,15;
-      }
-    }    
-*/
+  }
+}
+
+#railway {
+  line-width: 0.9;
+  line-color: #444;
+  line-opacity: 0.6;
+  // Hatching
+  h/line-width: 2.5;
+  h/line-color: #444;
+  h/line-dasharray: 1,7;
+  h/line-opacity: 0.6;
+  [tunnel='yes'] {
+    line-dasharray: 2,2;
+    h/line-width: 2;
+  }
+  [zoom>=16] {
+    line-width: 1.5;
+    line-color: #444;
+    // Hatching
+    h/line-width: 8;
+    h/line-color: #444;
+    h/line-dasharray: 1,15;
+    [tunnel='yes'] {
+      line-dasharray: 4,4;
+      h/line-width: 6;
+    }
   }
 }

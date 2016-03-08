@@ -458,6 +458,28 @@ Layer:
             prio
         ) AS _
   - <<: *layer
+    name: railway
+    id:   railway
+    geometry: "linestring"
+    properties:
+      minzoom: 8
+    Datasource:
+      <<: *postgis
+      geometry_field: way
+      table: >
+        (
+          SELECT
+            way,
+            name,
+            railway as type,
+            tunnel,
+            access
+          FROM planet_osm_line
+          WHERE way && !bbox!
+          AND railway IS NOT NULL
+        ) AS _
+  - <<: *layer
+  - <<: *layer
     name: bridge
     id:   bridge
     geometry: "linestring"
