@@ -227,13 +227,21 @@
 // =====================================================================
 
 #electric_utility {
-  ::transmission_structures [zoom>=15]{
+  ::transmission_structures {
     [structure="tower"] {
-      [zoom>=12] { marker-width: 5; }
-      [zoom>=14] { marker-width: 10; }
-      [zoom>=16] { marker-width: 14; }
-      marker-file: url('img/humanitarian/electric_utility/electric-tower.svg');
-      marker-transform: translate(0,5);
+      [zoom>=13] {
+        marker-file: url('img/maki/circle-18.svg');
+        marker-width: 2;
+      }
+      [zoom>=14] { marker-width: 4; }
+      [zoom>=15] {
+        marker-file: url('img/humanitarian/electric_utility/electric-tower.svg');
+        marker-transform: translate(0,5);
+        marker-width: 5;
+      }
+      [zoom>=16] { marker-width: 8; }
+      [zoom>=17] { marker-width: 10; }
+      [zoom>=18] { marker-width: 14; }
     }
     [structure="pole"] { 
       marker-file: url('img/maki/circle-18.svg');
