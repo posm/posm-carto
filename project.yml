@@ -799,7 +799,21 @@ Layer:
           WHERE way && !bbox!
             AND power IN ('generator','tower','pole','line','minor_line','station','substation','sub_station','transformer')
         ) AS _
-#  - admin
+  - id: admin
+    name: admin
+    geometry: "linestring"
+    Datasource:
+      <<: *postgis
+      geometry_field: way
+      table: >
+        (SELECT
+            way,
+            admin_level::integer as admin_level
+          FROM planet_osm_line
+          WHERE boundary = 'administrative'
+            AND admin_level IN ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10')
+          ORDER BY admin_level::integer DESC -- With 10 as a valid value, we need to do a numeric ordering, not a text ordering
+        ) AS _
 #  - country_label_line
 #  - country_label
 #  - marine_label

@@ -343,28 +343,22 @@ Map {
 // =====================================================================
 
 #admin[zoom>=2] {
-  ::lev2outline[admin_level=2][maritime=0] {
-    opacity: 0.7;
-    line-join: round;
-    line-cap: round;
-    line-color: #fff;
-    [zoom>=2][zoom<=3] { line-width: 0.4 + 2; }
-    [zoom>=4][zoom<=5] { line-width: 0.8 + 2; }
-    [zoom>=6][zoom<=7] { line-width: 1.2 + 3; }
-    [zoom>=8][zoom<=9] { line-width: 1.8 + 3; }
-    [zoom>=10][zoom<=11] { line-width: 2.2 + 3; }
-    [zoom>=12][zoom<=13] { line-width: 2.6 + 3; }
-    [zoom>=14][zoom<=15] { line-width: 3.0 + 3; }
-    [zoom>=16] { line-width: 4.0 + 3; }
-  }
-  ::lev2[admin_level=2] {
+  [admin_level=2] {
+    outline/opacity: 0.7;
+    outline/line-join: round;
+    outline/line-cap: round;
+    outline/line-color: #fff;
+    [zoom>=2][zoom<=3] { outline/line-width: 0.4 + 2; }
+    [zoom>=4][zoom<=5] { outline/line-width: 0.8 + 2; }
+    [zoom>=6][zoom<=7] { outline/line-width: 1.2 + 3; }
+    [zoom>=8][zoom<=9] { outline/line-width: 1.8 + 3; }
+    [zoom>=10][zoom<=11] { outline/line-width: 2.2 + 3; }
+    [zoom>=12][zoom<=13] { outline/line-width: 2.6 + 3; }
+    [zoom>=14][zoom<=15] { outline/line-width: 3.0 + 3; }
+    [zoom>=16] { outline/line-width: 4.0 + 3; }
     opacity: 0.75;
     line-join: round;
     line-color: @admin_2;
-    [maritime=1] {
-      line-color: #001642;
-      line-opacity: 0.2;
-    }
     [zoom>=2][zoom<=3] { line-width: 1.4; }
     [zoom>=4][zoom<=5] { line-width: 1.8; }
     [zoom>=6][zoom<=7] { line-width: 2.2; }
@@ -373,40 +367,30 @@ Map {
     [zoom>=12][zoom<=13] { line-width: 3.6; }
     [zoom>=14][zoom<=15] { line-width: 4.0; }
     [zoom>=16] { line-width: 5.0; }
-    [disputed=1][zoom<=5] { line-dasharray: 4 , 3; }
-    [disputed=1][zoom>=6][zoom<=7] { line-dasharray: 5 , 3; }
-    [disputed=1][zoom>=8][zoom<=9] { line-dasharray: 7 , 4; }
-    [disputed=1][zoom>=10][zoom<=11] { line-dasharray: 9 , 5; }
-    [disputed=1][zoom>=12][zoom<=13] { line-dasharray: 11 , 6; }
-    [disputed=1][zoom>=14][zoom<=15] { line-dasharray: 13 , 7; }
-    [disputed=1][zoom>=16] { line-dasharray: 15 , 8; }
   }
-  ::lev34outline[admin_level>=3][maritime=0] {
-    opacity: 0.8;
-    line-join: round;
-    line-cap: round;
-    line-color: #fff;
-    line-opacity: 0.75;
-    [zoom=5] { line-width: 0.4 + 2; }
-    [zoom>=6][zoom<=7] { line-width: 0.8 + 3; }
-    [zoom>=8][zoom<=9] { line-width: 1.2 + 3; }
-    [zoom>=10][zoom<=11] { line-width: 1.6 + 3; }
-    [zoom>=12][zoom<=13] { line-width: 2.0 + 3; }
-    [zoom>=14][zoom<=15] { line-width: 2.4 + 3; }
-    [zoom>=16] { line-width: 2.8 + 2; }
-  }
-  ::lev34[admin_level>=3] {
+  [admin_level>=3][admin_level<=8] {
+    outline/opacity: 0.8;
+    outline/line-join: round;
+    outline/line-cap: round;
+    outline/line-color: #fff;
+    outline/line-opacity: 0.75;
+    [zoom=5] { outline/line-width: 0.4 + 2; }
+    [zoom>=6][zoom<=7] { outline/line-width: 0.8 + 3; }
+    [zoom>=8][zoom<=9] { outline/line-width: 1.2 + 3; }
+    [zoom>=10][zoom<=11] { outline/line-width: 1.6 + 3; }
+    [zoom>=12][zoom<=13] { outline/line-width: 2.0 + 3; }
+    [zoom>=14][zoom<=15] { outline/line-width: 2.4 + 3; }
+    [zoom>=16] { outline/line-width: 2.8 + 2; }
     [admin_level=3] {
       line-color: @admin_3;
       line-opacity: 0.65;
       line-dasharray: 12, 3;
     }
-    [admin_level=4] {
+    [admin_level>=4][admin_level<=8] {
       line-color: @admin_4;
       line-opacity: 0.7;
       line-dasharray: 10, 2;
     }
-    [maritime=1] { line-opacity: 0.04; }
     [zoom>=2][zoom<=3] { line-width: 1.2; }
     [zoom>=4][zoom<=5] { line-width: 1.4; }
     [zoom>=6][zoom<=7] { line-width: 1.8; }
@@ -416,4 +400,17 @@ Map {
     [zoom>=14][zoom<=15] { line-width: 3.4; }
     [zoom>=16] { line-width: 2.8; }
   }
+  /*
+  The following code prevents admin boundaries from being rendered on top of
+  each other. Comp-op works on the entire attachment, not on the individual
+  border. Therefore, this code generates an attachment containing a set of
+  @admin-boundaries/white dashed lines (of which only the top one is visible),
+  and with `comp-op: darken` the white part is ignored, while the
+  @admin-boundaries colored part is rendered (as long as the background is not
+  darker than @admin-boundaries).
+  The SQL has `ORDER BY admin_level`, so the boundary with the lowest
+  admin_level is rendered on top, and therefore the only visible boundary.
+  */
+  opacity: 0.4;
+  comp-op: darken;
 }
