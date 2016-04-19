@@ -20,7 +20,7 @@
 // LANDUSE & LANDCOVER COLORS
 // =====================================================================
 
-@land:              #fff9e8;
+@land:              #ffffff;
 @water:             #5bb3f2;
 @grass:             #e9f2ba;
 @sand:              #F7ECD2;
