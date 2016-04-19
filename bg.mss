@@ -102,7 +102,6 @@ Map {
 // =====================================================================
 
 #landuse[zoom>=7] {
-  polygon-opacity: 0.5;
   [class='pitch'] {
     polygon-fill: @pitch;
     [zoom>14] {

@@ -64,7 +64,7 @@ Layer:
             way,
             name,
             CASE WHEN leisure = 'common' OR landuse = 'village_green' THEN 'common'
-                 WHEN leisure = 'park' THEN 'park'
+                 WHEN leisure IN ('park','nature_reserve') THEN 'park'
                  WHEN leisure = 'garden' THEN 'garden'
                  WHEN leisure = 'pitch' THEN 'pitch'
                  WHEN leisure IN ('playground','recreation_ground') THEN 'playground'
@@ -72,7 +72,7 @@ Layer:
                  WHEN amenity = 'parking' THEN 'parking'
                  WHEN landuse = 'cemetery' THEN 'cemetery'
                  WHEN landuse = 'industrial' THEN 'industrial'
-                 WHEN landuse IN ('farmland','farm','farmyard','orchard') THEN 'agriculture'
+                 WHEN landuse IN ('farmland','farm','farmyard','orchard','aquaculture') THEN 'agriculture'
                  WHEN landuse = 'forest' OR "natural" = 'wood' THEN 'wood'
                  WHEN landuse IN ('grass','greenfield','meadow') OR "natural" IN ('grass','grassland') THEN 'grass'
                  WHEN "natural" IN ('rock','bare_rock') THEN 'rock'
