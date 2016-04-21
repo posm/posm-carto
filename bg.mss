@@ -284,15 +284,29 @@ Map {
     }
     [zoom=15] {
       polygon-fill:lighten(@building,1);
+      //line-color:darken(@building,30);
+      //line-width:0.5;
+    }
+    [zoom>15] {
+      polygon-fill:@building;
+      //line-color:darken(@building,40);
+      //line-width:0.75;
+    }
+  }
+}
+#building_outline[zoom>15] {
+    [zoom=15] {
+      polygon-opacity: 0.5;
+      polygon-fill:lighten(@building,1);
       line-color:darken(@building,30);
       line-width:0.5;
     }
     [zoom>15] {
+      polygon-opacity: 0.5;
       polygon-fill:@building;
       line-color:darken(@building,40);
       line-width:0.75;
     }
-  }
 }
 
 
