@@ -479,7 +479,6 @@ Layer:
           AND railway IS NOT NULL
         ) AS _
   - <<: *layer
-  - <<: *layer
     name: bridge
     id:   bridge
     geometry: "linestring"
@@ -522,6 +521,28 @@ Layer:
           WHERE way && !bbox!
             AND (barrier IN ('checkpoint', 'debris','gate')
             OR military = 'checkpoint')
+        ) AS _
+  - <<: *layer
+    name: building_outline
+    id:   building_outline
+    properties:
+      minzoom: 12
+    geometry: "polygon"
+    Datasource:
+      <<: *postgis
+      geometry_field: way
+      table: >
+        (
+          -- Make sure this is the same query as the building layer above
+          SELECT
+            way,
+            name,
+            CASE WHEN building IS NOT NULL THEN building
+                 ELSE aeroway END AS type
+          FROM planet_osm_polygon
+          WHERE way && !bbox!
+          AND (building IS NOT NULL
+          OR aeroway IN ('terminal','hangar'))
         ) AS _
   - <<: *layer
     name: sanitation
