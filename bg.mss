@@ -143,6 +143,7 @@ Map {
     polygon-fill: @snow;
   }
   [class='park'],
+  [class='garden'],
   [class='common'] {
     polygon-fill: @park;
     polygon-opacity: 0.7;

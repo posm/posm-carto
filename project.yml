@@ -71,6 +71,7 @@ Layer:
                  WHEN leisure = 'stadium' THEN 'stadium'
                  WHEN amenity = 'parking' THEN 'parking'
                  WHEN landuse = 'cemetery' THEN 'cemetery'
+                 WHEN landuse = 'allotments' THEN 'garden'
                  WHEN landuse = 'industrial' THEN 'industrial'
                  WHEN landuse IN ('farmland','farm','farmyard','orchard','aquaculture') THEN 'agriculture'
                  WHEN landuse = 'forest' OR "natural" = 'wood' THEN 'wood'
