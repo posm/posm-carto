@@ -17,7 +17,7 @@
         marker-ignore-placement: true;
       }
     }
-    ::label {
+    ::label[name!=""] {
       text-name: [name];
       text-face-name: @sans_italic;
       text-size: 10;

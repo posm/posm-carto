@@ -895,7 +895,7 @@ Layer:
                  WHEN "natural" IS NOT NULL THEN "natural"
                  WHEN man_made IS NOT NULL THEN man_made
                  ELSE '' END AS type,
-            CASE WHEN amenity IN ('bank','bar','cafe','cinema','college','dentist','embassy','fuel','hospital','restaurant') THEN amenity
+            CASE WHEN amenity IN ('bank','bar','cafe','cinema','college','dentist','embassy','fuel','hospital','police','restaurant') THEN amenity
                  WHEN amenity = 'bus_station' THEN 'bus'
                  WHEN amenity = 'doctors' THEN 'hospital'
                  WHEN amenity = 'fast_food' THEN 'fast-food'
@@ -929,7 +929,50 @@ Layer:
           FROM planet_osm_point
           WHERE way && !bbox!
             AND (place IS NULL OR place NOT IN ('city', 'town', 'suburb', 'village', 'hamlet', 'neighbourhood', 'locality', 'isolated_dwelling', 'farm', 'junction', 'traffic_signals','country', 'county', 'region', 'state'))
-            AND name IS NOT NULL
+        UNION ALL
+        SELECT
+            way,
+            name,
+            CASE WHEN amenity IS NOT NULL THEN amenity
+                 WHEN tourism IS NOT NULL THEN tourism
+                 WHEN shop IS NOT NULL THEN shop
+                 WHEN place IS NOT NULL THEN place
+                 WHEN "natural" IS NOT NULL THEN "natural"
+                 WHEN man_made IS NOT NULL THEN man_made
+                 ELSE '' END AS type,
+            CASE WHEN amenity IN ('bank','bar','cafe','cinema','college','dentist','embassy','fuel','hospital','police','restaurant') THEN amenity
+                 WHEN amenity = 'bus_station' THEN 'bus'
+                 WHEN amenity = 'doctors' THEN 'hospital'
+                 WHEN amenity = 'fast_food' THEN 'fast-food'
+                 WHEN amenity = 'fire_station' THEN 'fire-station'
+                 WHEN amenity = 'ice_cream' OR shop = 'ice_cream' THEN 'ice-cream'
+                 WHEN amenity = 'kindergarten' THEN 'school'
+                 WHEN amenity = 'place_of_worship' THEN 'place-of-worship'
+                 WHEN amenity = 'pub' THEN 'bar'
+                 WHEN amenity = 'public_building' THEN 'building'
+                 WHEN amenity = 'swimming_pool' THEN 'swimming'
+                 WHEN amenity = 'university' THEN 'college'
+                 WHEN amenity = 'townhall' THEN 'town-hall'
+                 WHEN amenity IN ('post_box','post_office') THEN 'post'
+                 WHEN tourism IN ('museum','zoo') THEN tourism
+                 WHEN tourism IN ('hotel','motel','hostel','guest_house') THEN 'lodging'
+                 WHEN tourism = 'camp_site' THEN 'campsite'
+                 WHEN shop IN ('bakery','bicycle','camera','car','laundry','music') THEN shop
+                 WHEN shop IN ('convenience','greengrocer','supermarket') THEN 'grocery'
+                 WHEN shop IN ('alcohol','beverages') THEN 'alcohol-shop'
+                 WHEN shop = 'art' THEN 'art-gallery'
+                 WHEN shop = 'hifi' THEN 'music'
+                 WHEN shop IN ('car_parts','car_repair') THEN 'car'
+                 WHEN shop = 'clothes' THEN 'clothing-store'
+                 WHEN shop = 'mobile_phone' THEN 'mobilephone'
+                 WHEN man_made IN ('lighthouse','bicycle','camera') THEN man_made
+                 WHEN man_made = 'petroleum_well' THEN 'oil-well'
+                 WHEN man_made = 'obelisk' THEN 'monument'
+                 WHEN man_made IS NOT NULL THEN 'square'
+                 WHEN shop IS NOT NULL THEN 'shop'
+                 ELSE '' END AS maki
+          FROM planet_osm_polygon
+          WHERE way && !bbox!
         ) AS poi_label
 #  - hdm_label
   - <<: *layer
