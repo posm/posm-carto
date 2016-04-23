@@ -205,6 +205,8 @@
     [type='service'][zoom>=10],
     [type='pedestrian'][zoom>=12],
     [type='track'][zoom>=10] {
+      line-join:round;
+      line-cap:round;
       #tunnel { line-opacity: 0.2; }
       line-color: @caseStreet;
       [zoom<=13] { line-opacity: 0.5; }
@@ -400,6 +402,8 @@
     [type='service'][zoom>=14],
     [type='pedestrian'][zoom>=12],
     [type='track'][zoom>=14] {
+      line-join:round;
+      line-cap:round;
       line-color:@fillStreet;
       line-width:0;
       [zoom>=14] { line-width:1.5;  }
