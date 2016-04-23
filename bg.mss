@@ -320,6 +320,7 @@ Map {
   line-color:#7e7f88;
 }
 
+#barrier_line[zoom>=17][class='wall'],
 #barrier_line[zoom>=17][class='fence'] {
   line-color:@building;
   [zoom=17] { line-width:0.6; }

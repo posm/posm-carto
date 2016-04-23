@@ -262,7 +262,7 @@ Layer:
           FROM planet_osm_line
           WHERE way && !bbox!
           AND ("natural" = 'cliff'
-          OR barrier IN ('hedge', 'fence', 'gate'))
+          OR barrier IN ('hedge', 'fence', 'gate','wall'))
         ) AS _
   - <<: *layer
     name: aeroway
