@@ -51,6 +51,55 @@ Stylesheet:
 
 Layer:
 
+
+  - <<: *layer
+    name: ne_10m_rivers_lake_centerlines_scale_rank
+    id:   ne_10m_rivers_lake_centerlines_scale_rank
+    properties:
+      minzoom: 4
+      maxzoom: 8
+    Datasource:
+      <<: *postgis
+      geometry_field: geom
+      table: ne_10m_rivers_lake_centerlines_scale_rank
+      encoding: "ISO-8859-1"
+
+  - <<: *layer
+    name: ne_10m_lakes
+    id:   ne_10m_lakes
+    properties:
+      minzoom: 5
+      maxzoom: 8
+    Datasource:
+      <<: *postgis
+      geometry_field: geom
+      table: ne_10m_lakes
+      encoding: "ISO-8859-1"
+
+  - <<: *layer
+    name: ne_10m_admin_0_boundary_lines_land
+    id:   ne_10m_admin_0_boundary_lines_land
+    class: country-boundary-10m
+    properties:
+      minzoom: 2
+      maxzoom: 9
+    Datasource:
+      <<: *postgis
+      geometry_field: geom
+      table: ne_10m_admin_0_boundary_lines_land
+
+  - <<: *layer
+    name: ne-roads
+    id:   ne-roads
+    properties:
+      minzoom: 5
+      maxzoom: 8
+      cache-features: on
+    Datasource:
+      <<: *postgis
+      geometry_field: geom
+      table: ne_10m_roads
+
   - <<: *layer
     name: landuse
     id:   landuse

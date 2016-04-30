@@ -7,6 +7,7 @@ Map {
 // WATER AREAS
 // =====================================================================
 
+#ne_10m_lakes,
 #coastline_water,
 #water {
   polygon-fill: @water;
@@ -31,6 +32,10 @@ Map {
 // WATER WAYS
 // =====================================================================
 
+#ne_10m_rivers_lake_centerlines_scale_rank[zoom=4][scalerank<4],
+#ne_10m_rivers_lake_centerlines_scale_rank[zoom=5][scalerank<5],
+#ne_10m_rivers_lake_centerlines_scale_rank[zoom=6][scalerank<6],
+#ne_10m_rivers_lake_centerlines_scale_rank[zoom=7][scalerank<7],
 #waterway[zoom>=8][zoom<=11],
 #waterway[class='river'][zoom>=12],
 #waterway[class='canal'][zoom>=12] {
@@ -357,6 +362,23 @@ Map {
 // ADMINISTRATIVE BOUNDARIES
 // =====================================================================
 
+#ne_10m_admin_0_boundary_lines_land {
+    outline/opacity: 0.7;
+    outline/line-join: round;
+    outline/line-cap: round;
+    outline/line-color: #fff;
+    [zoom>=2][zoom<=3] { outline/line-width: 0.4 + 2; }
+    [zoom>=4][zoom<=5] { outline/line-width: 0.8 + 2; }
+    [zoom>=6][zoom<=7] { outline/line-width: 1.2 + 3; }
+    [zoom>=8][zoom<=9] { outline/line-width: 1.8 + 3; }
+    opacity: 0.75;
+    line-join: round;
+    line-color: @admin_2;
+    [zoom>=2][zoom<=3] { line-width: 1.4; }
+    [zoom>=4][zoom<=5] { line-width: 1.8; }
+    [zoom>=6][zoom<=7] { line-width: 2.2; }
+    [zoom>=8][zoom<=9] { line-width: 2.8; }
+}
 #admin[zoom>=2] {
   [admin_level=2] {
     outline/opacity: 0.7;

@@ -25,13 +25,10 @@
 @path_line:     #323232;
 
 
-/* Just a skeleton for context */
-/*
-#road, #bridge, #tunnel {
-  line-color: gray;
-  line-width: 3;
+#ne-roads {
+  line-color: lightgray;
+  line-width: 1;
 }
-*/
 #road_area[zoom>=12] {
   polygon-fill: @fillStreet;
   line-color: @caseStreet;
