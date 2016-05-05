@@ -99,7 +99,7 @@ db/natearth: db/ne_10m_rivers_lake_centerlines_scale_rank \
 		   db/ne_10m_roads \
 		   db/ne_10m_lakes \
 		   db/ne_10m_admin_0_boundary_lines_land \
-		   db/ne_10m_admin_1_states_provinces_scale_rank \
+		   db/ne_10m_admin_1_label_points \
 		   db/ne_10m_admin_1_states_provinces_lines
 
 define natural_earth
@@ -130,7 +130,7 @@ NATURAL_EARTH=ne_10m_rivers_lake_centerlines_scale_rank:data/ne/10m/physical/ne_
 	ne_10m_roads:data/ne/10m/cultural/ne_10m_roads.zip \
 	ne_10m_lakes:data/ne/10m/physical/ne_10m_lakes.zip \
 	ne_10m_admin_0_boundary_lines_land:data/ne/10m/cultural/ne_10m_admin_0_boundary_lines_land.zip \
-	ne_10m_admin_1_states_provinces_scale_rank:data/ne-stamen/10m/cultural/ne_10m_admin_1_states_provinces_scale_rank.zip:ne_10m_admin_1_states_provinces_scale_rank/ne_10m_admin_1_states_provinces_scale_rank.shp \
+	ne_10m_admin_1_label_points:data/ne/10m/cultural/ne_10m_admin_1_label_points.zip \
 	ne_10m_admin_1_states_provinces_lines:data/ne/10m/cultural/ne_10m_admin_1_states_provinces_lines.zip:ne_10m_admin_1_states_provinces_lines.shp
 
 $(foreach shape,$(NATURAL_EARTH),$(eval $(call natural_earth,$(shape))))

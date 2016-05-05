@@ -367,19 +367,40 @@ Map {
     outline/line-join: round;
     outline/line-cap: round;
     outline/line-color: #fff;
-    [zoom>=2][zoom<=3] { outline/line-width: 0.4 + 2; }
-    [zoom>=4][zoom<=5] { outline/line-width: 0.8 + 2; }
-    [zoom>=6][zoom<=7] { outline/line-width: 1.2 + 3; }
-    [zoom>=8][zoom<=9] { outline/line-width: 1.8 + 3; }
+    [zoom>=2][zoom<=3] { outline/line-width: 0.4 + 2; outline/opacity:0.7; }
+    [zoom>=4][zoom<=5] { outline/line-width: 0.8 + 2; outline/opacity:0.7; }
+    [zoom>=6][zoom<=7] { outline/line-width: 1.2 + 3; outline/opacity:0.5; }
+    [zoom>=8][zoom<=9] { outline/line-width: 1.8 + 3; outline/opacity:0.3; }
     opacity: 0.75;
     line-join: round;
     line-color: @admin_2;
-    [zoom>=2][zoom<=3] { line-width: 1.4; }
-    [zoom>=4][zoom<=5] { line-width: 1.8; }
-    [zoom>=6][zoom<=7] { line-width: 2.2; }
-    [zoom>=8][zoom<=9] { line-width: 2.8; }
+    [zoom>=2][zoom<=3] { line-width: 1.4; opacity:0.75; }
+    [zoom>=4][zoom<=5] { line-width: 1.8; opacity:0.75; }
+    [zoom>=6][zoom<=7] { line-width: 2.2; opacity:0.6; }
+    [zoom>=8][zoom<=9] { line-width: 2.8; opacity:0.4; }
 }
-#admin[zoom>=2] {
+#ne_10m_admin_1_states_provinces_lines[zoom>=4][scalerank<=2],
+#ne_10m_admin_1_states_provinces_lines[zoom>=6] {
+    outline/opacity: 0.7;
+    outline/line-join: round;
+    outline/line-cap: round;
+    outline/line-color: #fff;
+    [zoom>=4][zoom<=5] { outline/line-width: 0.4 + 2; outline/opacity:0.7; }
+    [zoom>=6][zoom<=7] { outline/line-width: 0.8 + 2; outline/opacity:0.7; }
+    [zoom>=8][zoom<=9] { outline/line-width: 1.2 + 3; outline/opacity:0.5; }
+    opacity: 0.75;
+    line-join: round;
+    line-color: @admin_4;
+    //line-color: lighten(@admin_2,10%);
+    [zoom>=4][zoom<=5] { line-width: 1.4; opacity:0.75; }
+    [zoom>=6][zoom<=7] { line-width: 1.8; opacity:0.75; }
+    [zoom>=8][zoom<=9] { line-width: 2.2; opacity:0.6; }
+}
+#admin[zoom>=2][admin_level<=2],
+#admin[zoom>=6][admin_level<=4],
+#admin[zoom>=8][admin_level<=6],
+#admin[zoom>=10][admin_level<=8],
+#admin[zoom>=12] {
   [admin_level=2] {
     outline/opacity: 0.7;
     outline/line-join: round;

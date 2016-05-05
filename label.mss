@@ -50,6 +50,28 @@
 // 2__ PLACE NAMES
 // =====================================================================
 
+// Countries and States/Provinces ______________________________________
+
+#ne_10m_admin_0_countries_lakes[name!='USNB Guantanamo Bay'],
+#ne_10m_admin_1_label_points[adm0_sr=1][zoom>=4][scalerank<=2],
+#ne_10m_admin_1_label_points[adm0_sr=1][zoom>=6] {
+  text-name: @name;
+  text-face-name: @sans;
+  text-placement: point;
+  text-fill: @city_text;
+  text-halo-fill: #fff;
+  text-halo-radius: 2;
+  text-halo-rasterizer: fast;
+  text-wrap-width: 40;
+  text-line-spacing: -4;
+
+  //text-size: 10;
+  text-wrap-width: 60;
+  [scalerank<8] { text-size: 11; }
+  [scalerank<6] { text-size: 12; }
+  [scalerank<4] { text-size: 14; }
+  [scalerank<2] { text-size: 18; } // only admin 0 has this
+}
 // 2_3__ Cities ________________________________________________________
 
 #place_label[type='city'][zoom>=8][zoom<=15] {
@@ -240,6 +262,21 @@
   }
 }
 
+#ne_10m_rivers_lake_centerlines_scale_rank_labels[zoom=4][scalerank<4],
+#ne_10m_rivers_lake_centerlines_scale_rank_labels[zoom=5][scalerank<5],
+#ne_10m_rivers_lake_centerlines_scale_rank_labels[zoom=6][scalerank<6],
+#ne_10m_rivers_lake_centerlines_scale_rank_labels[zoom=7][scalerank<7],
+#ne_10m_rivers_lake_centerlines_scale_rank_labels[zoom>=8] {
+    text-avoid-edges: true;
+    text-name: @name;
+    text-face-name: @sans_italic;
+    text-fill: @water * 0.75;
+    text-halo-fill: fadeout(#fff,80%);
+    text-halo-radius: 1.5;
+    text-halo-rasterizer: fast;
+    text-placement: line;
+    text-size: 10;
+}
 
 #waterway_label {
   ::river [class='river'][zoom>=13],
