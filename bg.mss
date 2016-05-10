@@ -347,7 +347,8 @@ Map {
   [zoom>=16] { line-pattern-file: url(img/pattern/cliff-lg.png); }
 }
 
-#water_barriers {
+#water_barriers[waterway='dam'],
+#water_barriers[waterway!='dam'][zoom>=14] {
   line-color: @dam-line;
   line-width: 2;
   line-join: round;
