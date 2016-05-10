@@ -68,8 +68,6 @@ define create_extension
 	psql -v ON_ERROR_STOP=1 -qX1c "CREATE EXTENSION $(subst db/,,$@)"
 endef
 
-.PHONY: db/shapefiles
-
 db/shapefiles: shp/water_polygons.shp \
 	shp/water_polygons.dbf \
 	shp/water_polygons.prj \
@@ -153,8 +151,6 @@ scales=10m 50m 110m
 themes=cultural physical raster
 
 $(foreach a,$(scales),$(foreach b,$(themes),$(eval $(call natural_earth_sources,$(a),$(b)))))
-
-.PHONY: db/fonts
 
 db/fonts: fonts/NotoSans-Regular.ttf \
 	fonts/unifont-Medium.ttf \
