@@ -170,7 +170,8 @@ fonts/NotoSans-Regular.zip:
 #fonts/unifont-Medium.zip:
 fonts/unifont-Medium.ttf:
 	@mkdir -p $$(dirname $@)
-	curl -Lf http://unifoundry.com/pub/unifont-8.0.01/font-builds/unifont-8.0.01.ttf -o $@
+	curl -Lf http://posm.s3.amazonaws.com/resources/unifont-8.0.01.ttf -o $@
+	# curl -Lf http://unifoundry.com/pub/unifont-8.0.01/font-builds/unifont-8.0.01.ttf -o $@
 
 fonts/DejaVuSans.zip:
 	@mkdir -p $$(dirname $@)
