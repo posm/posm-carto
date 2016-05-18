@@ -1,0 +1,54 @@
+#!/bin/bash -e
+
+# A simple script that generates the standard road shields.
+# Run from the same directory as create_shield
+# Copyright 2014 Paul Norman
+# Modified 2016 by Alan McConchie
+# Released under the Creative Commons CC0 license
+
+widths='
+1:14
+2:20
+3:25
+4:30
+5:35
+6:42
+7:49
+8:56
+9:63
+10:70'
+
+colours='default:#ffffff'
+
+
+colours='default:#ffffff'
+
+#colours='motorway:#7788a1
+#trunk:#87ab87
+#primary:#bb7b7f
+#secondary:#c6ad84
+#tertiary:#c4c68f'
+
+
+xoffset=1.25
+yoffset=1.75
+
+heights='
+1:12
+2:24
+3:36
+4:48'
+
+for h in $heights; do
+  for w in $widths; do
+    xchars=$(echo $w | awk -F ":" '{print $1}')
+    xpixels=$(echo $w | awk -F ":" '{print $2}')
+    ychars=$(echo $h | awk -F ":" '{print $1}')
+    ypixels=$(echo $h | awk -F ":" '{print $2}')
+    for shield in $colours; do
+      class=$(echo $shield | awk -F ":" '{print $1}')
+      colour=$(echo $shield | awk -F ":" '{print $2}')
+      ./create_shield $colour $xpixels $ypixels $xoffset $yoffset > "${class}_${xchars}x${ychars}.svg"
+    done;
+  done;
+done;

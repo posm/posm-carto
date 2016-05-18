@@ -1102,14 +1102,14 @@ Layer:
     Datasource:
       <<: *postgis
       table: |-
-       --(SELECT * FROM
+       (SELECT * FROM
        (SELECT
          way,
          highway,
          orig_ref,
          array_length(refs,1) AS height,
          regexp_replace(orig_ref, '\s*;\s*', E'\n', 'g') AS refs,
-         MAX(ref_width) as reflen
+         MAX(ref_width) as width
        FROM (
          SELECT way, highway, orig_ref, refs, ref, SUM(CASE WHEN ascii_val < 255 THEN 1 ELSE 2 END) AS ref_width
          FROM (
@@ -1135,7 +1135,7 @@ Layer:
          GROUP BY way, highway, orig_ref, refs, ref
        ) AS query4
        GROUP BY way, highway, orig_ref, refs) as innerquery
-       --WHERE height <= 4 AND width <= 11) as roads_text_ref
+       WHERE height <= 4 AND width <= 10) as roads_text_ref
 #  - waterway_label
   - <<: *layer
     id: housenum_label

@@ -302,10 +302,10 @@
 // =====================================================================
 
 // highway shield
-#roads-text-ref[reflen<=6] {
+#roads-text-ref[width<=10][height<=4] {
   shield-name: "[refs]";
   shield-size: 9;
-  shield-file: url('img/shield/generic-sm-[reflen].png');
+  shield-file: url('img/shield/default_[width]x[height].svg');
   shield-face-name: @sans_bold;
   shield-fill: #555;
   shield-spacing: 200;
@@ -318,8 +318,6 @@
   [zoom>=14] {
     shield-spacing: 400;
     shield-min-distance: 80;
-    shield-size: 11;
-    shield-file: url('img/shield/generic-md-[reflen].png');
   }
 }
 

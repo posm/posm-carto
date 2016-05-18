@@ -1,0 +1,35 @@
+#!/bin/bash -e
+
+# A simple script to generate a SVG road shield.
+# Copyright 2014 Paul Norman
+# Modified 2016 by Alan McConchie
+# Released under the Creative Commons CC0 license
+
+# Syntax
+# ./create_shield colour width height xoffset yoffset
+
+# Fixed values
+RADIUS=2
+OUTERLINE=0
+WHITELINE=1
+
+COLOUR=$1
+WIDTH=$2
+HEIGHT=$3
+XOFFSET=$4
+YOFFSET=$5
+
+
+echo "<svg xmlns='http://www.w3.org/2000/svg' width='100%' height='100%' "\
+"viewBox='0 0 $(bc -q <<< "$WIDTH + $XOFFSET") $(bc -q <<< "$HEIGHT + $YOFFSET")'>"
+
+echo "<rect x='$XOFFSET' y='$YOFFSET' height='$HEIGHT' width='$WIDTH' fill='$COLOUR'/>"
+
+echo "<rect x='$(bc -q <<< "$XOFFSET + $OUTERLINE")' y='$(bc -q <<< "$YOFFSET + $OUTERLINE")' "\
+"height='$(bc -q <<< "$HEIGHT - 2*$OUTERLINE")' width='$(bc -q <<< "$WIDTH - 2*$OUTERLINE")' "\
+"rx='$(bc -q <<< "$RADIUS - $OUTERLINE")' fill='black'/>"
+
+echo "<rect x='$(bc -q <<< "$XOFFSET + $OUTERLINE + $WHITELINE")' y='$(bc -q <<< "$YOFFSET + $OUTERLINE + $WHITELINE")' "\
+"height='$(bc -q <<< "$HEIGHT - 2*$OUTERLINE - 2*$WHITELINE")' width='$(bc -q <<< "$WIDTH - 2*$OUTERLINE - 2*$WHITELINE")' "\
+"rx='$(bc -q <<< "$RADIUS - $OUTERLINE - $WHITELINE")' fill='$COLOUR'/>"
+echo "</svg>"
