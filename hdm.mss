@@ -243,12 +243,12 @@
       [zoom>=17] { marker-width: 10; }
       [zoom>=18] { marker-width: 14; }
     }
-    [structure="pole"] { 
+    [structure="pole"][zoom>=15] {
       marker-file: url('img/maki/circle-18.svg');
-      marker-fill-opacity: 0;
-      [zoom>=15] { marker-width: 4; }
-      [zoom>=16] { marker-width: 6; }
-      [zoom>=18] { marker-width: 8; }
+      marker-fill-opacity: 0.5;
+      [zoom>=15] { marker-width: 2; }
+      [zoom>=16] { marker-width: 3; }
+      [zoom>=18] { marker-width: 4; }
     }
   }
 }
