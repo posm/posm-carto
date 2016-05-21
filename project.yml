@@ -42,9 +42,9 @@ Stylesheet:
   - vars.mss
   - bg.mss
   - road.mss
+  - hdm.mss
   - label.mss
   - poi_classic.mss
-  - hdm.mss
 
 
 # == Layers ============================================================
@@ -133,6 +133,7 @@ Layer:
                  WHEN landuse = 'cemetery' THEN 'cemetery'
                  WHEN landuse = 'allotments' THEN 'garden'
                  WHEN landuse = 'industrial' THEN 'industrial'
+                 WHEN landuse = 'military' OR (military IS NOT NULL) THEN 'military'
                  WHEN landuse IN ('farmland','farm','farmyard','orchard','aquaculture') THEN 'agriculture'
                  WHEN landuse = 'forest' OR "natural" = 'wood' THEN 'wood'
                  WHEN landuse IN ('grass','greenfield','meadow') OR "natural" IN ('grass','grassland') THEN 'grass'
@@ -146,11 +147,48 @@ Layer:
             AND (landuse IS NOT NULL
             OR  leisure IS NOT NULL
             OR  amenity = 'parking'
+            OR  military IS NOT NULL
             OR "natural" IS NOT NULL)
         ) AS _
   - <<: *layer
     name: site
     id:   site
+    geometry: "point"
+    properties:
+      minzoom: 12
+    Datasource:
+      <<: *postgis
+      geometry_field: way
+      table: >
+        (
+          SELECT
+            way,
+            name,
+            'site' as layer,
+            CASE WHEN amenity = 'shelter' OR tags->'shelter' = 'yes' THEN 'shelter'
+                 WHEN tags->'refugee' = 'yes' OR tags->'idp:camp_site' = 'spontaneous_camp' THEN 'camp'
+                 WHEN landuse = 'residential' THEN 'residential'
+                 WHEN leisure = 'common' THEN 'common'
+                 WHEN landuse = 'brownfield' THEN 'rubble'
+                 WHEN tags->'hazard' = 'landslide' OR tags->'hazard_type' = 'landslide' THEN 'landslide'
+                 ELSE '' END as class,
+            CASE WHEN tags->'refugee' = 'yes' THEN 'refugee'
+                 WHEN tags->'idp:camp_site' = 'spontaneous_camp' THEN 'idp'
+                 ELSE '' END as type
+          FROM planet_osm_point
+          WHERE way && !bbox!
+            AND (amenity = 'shelter'
+            OR landuse IN ('residential','brownfield')
+            OR tags->'shelter' = 'yes'
+            OR tags->'refugee' = 'yes'
+            OR tags->'idp:camp_site' = 'spontaneous_camp'
+            OR leisure = 'common'
+            OR tags->'hazard_type' = 'landslide'
+            OR tags->'hazard' = 'landslide')
+        ) AS _
+  - <<: *layer
+    name: site_poly
+    id:   site_poly
     geometry: "polygon"
     properties:
       minzoom: 12
@@ -162,13 +200,17 @@ Layer:
           SELECT
             way,
             name,
+            'site' as layer,
             CASE WHEN amenity = 'shelter' OR tags->'shelter' = 'yes' THEN 'shelter'
                  WHEN tags->'refugee' = 'yes' OR tags->'idp:camp_site' = 'spontaneous_camp' THEN 'camp'
                  WHEN landuse = 'residential' THEN 'residential'
                  WHEN leisure = 'common' THEN 'common'
                  WHEN landuse = 'brownfield' THEN 'rubble'
-                 WHEN tags->'hazard' = 'landslide' THEN 'landslide'
-                 ELSE '' END as class
+                 WHEN tags->'hazard' = 'landslide' OR tags->'hazard_type' = 'landslide' THEN 'landslide'
+                 ELSE '' END as class,
+            CASE WHEN tags->'refugee' = 'yes' THEN 'refugee'
+                 WHEN tags->'idp:camp_site' = 'spontaneous_camp' THEN 'idp'
+                 ELSE '' END as type
           FROM planet_osm_polygon
           WHERE way && !bbox!
             AND (amenity = 'shelter'
@@ -177,37 +219,7 @@ Layer:
             OR tags->'refugee' = 'yes'
             OR tags->'idp:camp_site' = 'spontaneous_camp'
             OR leisure = 'common'
-            OR tags->'hazard' = 'landslide')
-        ) AS _
-  - <<: *layer
-    name: site_line
-    id:   site_line
-    geometry: "linestring"
-    properties:
-      minzoom: 12
-    Datasource:
-      <<: *postgis
-      geometry_field: way
-      table: >
-        (
-          SELECT
-            way,
-            name,
-            CASE WHEN amenity = 'shelter' OR tags->'shelter' = 'yes' THEN 'shelter'
-                 WHEN tags->'refugee' = 'yes' OR tags->'idp:camp_site' = 'spontaneous_camp' THEN 'camp'
-                 WHEN landuse = 'residential' THEN 'residential'
-                 WHEN leisure = 'common' THEN 'common'
-                 WHEN landuse = 'brownfield' THEN 'rubble'
-                 WHEN tags->'hazard' = 'landslide' THEN 'landslide'
-                 ELSE '' END as class
-          FROM planet_osm_line
-          WHERE way && !bbox!
-            AND (amenity = 'shelter'
-            OR landuse IN ('residential','brownfield')
-            OR tags->'shelter' = 'yes'
-            OR tags->'refugee' = 'yes'
-            OR tags->'idp:camp_site' = 'spontaneous_camp'
-            OR leisure = 'common'
+            OR tags->'hazard_type' = 'landslide'
             OR tags->'hazard' = 'landslide')
         ) AS _
   - <<: *layer
@@ -412,6 +424,7 @@ Layer:
           SELECT
             way,
             name,
+            'building_condition' as layer,
             CASE WHEN building = 'construction' THEN 'construction'
                  WHEN tags->'damage' IN ('moderate','extensive','severe') THEN 'damaged'
                  WHEN tags->'damage' IN ('total','destroyed','collapsed','collapse','partially_collapsed') OR building IN ('collapsed','collapse') THEN 'damaged'
@@ -621,6 +634,7 @@ Layer:
           SELECT
             way,
             name,
+            'sanitation' as layer,
             CASE WHEN amenity = 'shower' THEN 'shower'
                  WHEN amenity = 'toilets' THEN 'toilet'
                  WHEN amenity IN ('waste_disposal','waste_basket','sanitary_dump_station') OR landuse = 'landfill' OR man_made = 'wastewater_plant' OR tags->'informal' = 'dumpsite' THEN 'waste'
@@ -646,6 +660,7 @@ Layer:
           SELECT
             way,
             name,
+            'sanitation' as layer,
             CASE WHEN amenity = 'shower' THEN 'shower'
                  WHEN amenity = 'toilets' THEN 'toilet'
                  WHEN amenity IN ('waste_disposal','waste_basket','sanitary_dump_station') OR landuse = 'landfill' OR man_made = 'wastewater_plant' OR tags->'informal' = 'dumpsite' THEN 'waste'
@@ -660,6 +675,40 @@ Layer:
   - <<: *layer
     name: water_source
     id:   water_source
+    geometry: "point"
+    properties:
+      minzoom: 10
+    Datasource:
+      <<: *postgis
+      geometry_field: way
+      table: >
+        (
+          SELECT
+            way,
+            name,
+            'water_source' as layer,
+            CASE WHEN man_made = 'water_well' THEN 'water well'
+                 WHEN man_made = 'water_tower' THEN 'water tower'
+                 WHEN man_made IN ('storage_tank','water_tank') THEN 'water tower'
+                 WHEN "natural" = 'spring' THEN 'spring'
+                 WHEN amenity = 'drinking_water' THEN 'drinking water'
+                 ELSE '' END as class,
+            CASE WHEN tags->'drinking_water' = 'yes' OR amenity = 'drinking_water' THEN 'yes'
+                 WHEN tags->'drinking_water' = 'no' THEN 'no'
+                 ELSE '' END as potable,
+            CASE WHEN tags->'pump' = 'yes' THEN 'yes'
+                 WHEN tags->'pump' = 'manual' OR tags->'pump_type' = 'manual' THEN 'manual'
+                 WHEN tags->'pump' = 'powered' OR tags->'pump_type' = 'powered_network' THEN 'powered'
+                 ELSE '' END as pump
+          FROM planet_osm_point
+          WHERE way && !bbox!
+            AND (man_made IN ('water_well', 'water_tower','storage_tank','water_tank')
+            OR "natural" = 'spring'
+            OR amenity = 'drinking_water')
+        ) AS _
+  - <<: *layer
+    name: water_source_poly
+    id:   water_source_poly
     geometry: "polygon"
     properties:
       minzoom: 10
@@ -671,6 +720,7 @@ Layer:
           SELECT
             way,
             name,
+            'water_source' as layer,
             CASE WHEN man_made = 'water_well' THEN 'water well'
                  WHEN man_made = 'water_tower' THEN 'water tower'
                  WHEN man_made IN ('storage_tank','water_tank') THEN 'water tower'
@@ -704,14 +754,16 @@ Layer:
           SELECT
             way,
             name,
+            'emergency' as layer,
             CASE WHEN tags->'emergency' IN ('ambulance_station','defibrillator','aed') OR tags->'medical' = 'aed' THEN 'medical rescue'
-                 WHEN tags->'emergency' IN ('fire_extinguisher','fire_hydrant','fire_hose','fire_flapper') THEN 'fire fighter'
+                 WHEN tags->'emergency' IN ('fire_extinguisher','fire_hydrant','fire_hose','fire_flapper') THEN 'fire fighting'
                  WHEN tags->'emergency' IN ('lifeguard_base','lifeguard_platform','lifeguard_place') THEN 'lifeguarding'
                  WHEN tags->'emergency' = 'assembly_point' THEN 'assembly point'
                  WHEN tags->'emergency' = 'access_point' THEN 'access point'
                  WHEN tags->'emergency' = 'phone' THEN 'emergency phone'
                  WHEN tags->'emergency' = 'siren' THEN 'emergency siren'
-                 WHEN aeroway = 'helipad' OR tags->'emergency:helipad' = 'potential' OR tags->'emergency' = 'landing_site' THEN 'helicopter'
+                 WHEN aeroway = 'helipad' THEN 'helicopter'
+                 WHEN tags->'emergency:helipad' = 'potential' OR tags->'emergency' = 'landing_site' THEN 'helicopter_potential'
                  ELSE '' END as class
           FROM planet_osm_point
           WHERE way && !bbox!
@@ -734,14 +786,17 @@ Layer:
           SELECT
             way,
             name,
+            'emergency' as layer,
             CASE WHEN tags->'emergency' IN ('ambulance_station','defibrillator','aed') OR tags->'medical' = 'aed' THEN 'medical rescue'
-                 WHEN tags->'emergency' IN ('fire_extinguisher','fire_hydrant','fire_hose','fire_flapper') THEN 'fire fighter'
+                 WHEN tags->'emergency' IN ('fire_extinguisher','fire_hose','fire_flapper') THEN 'fire fighting'
+                 WHEN tags->'emergency' = 'fire_hydrant' THEN 'hydrant'
                  WHEN tags->'emergency' IN ('lifeguard_base','lifeguard_platform','lifeguard_place') THEN 'lifeguarding'
                  WHEN tags->'emergency' = 'assembly_point' THEN 'assembly point'
                  WHEN tags->'emergency' = 'access_point' THEN 'access point'
                  WHEN tags->'emergency' = 'phone' THEN 'emergency phone'
                  WHEN tags->'emergency' = 'siren' THEN 'emergency siren'
-                 WHEN aeroway = 'helipad' OR tags->'emergency:helipad' = 'potential' OR tags->'emergency' = 'landing_site' THEN 'helicopter'
+                 WHEN aeroway = 'helipad' THEN 'helicopter'
+                 WHEN tags->'emergency:helipad' = 'potential' OR tags->'emergency' = 'landing_site' THEN 'helicopter_potential'
                  ELSE '' END as class
           FROM planet_osm_polygon
           WHERE way && !bbox!
@@ -753,6 +808,34 @@ Layer:
   - <<: *layer
     name: medical
     id:   medical
+    geometry: "point"
+    properties:
+      minzoom: 10
+    Datasource:
+      <<: *postgis
+      geometry_field: way
+      table: >
+        (
+          SELECT
+            way,
+            name,
+            'medical' as layer,
+            CASE WHEN amenity = 'hospital' THEN 'hospital'
+                 WHEN amenity = 'clinic' THEN 'clinic'
+                 WHEN tags->'health_facility_type' = 'field_hospital' OR tags->'health_facility:type' = 'field_hospital' THEN 'field hospital'
+                 WHEN amenity = 'pharmacy' THEN 'pharmacy'
+                 WHEN tags->'health_facility_type' = 'dispensary' OR tags->'health_facility:type' = 'dispensary' THEN 'dispensary'
+                 WHEN amenity = 'mortuary' THEN 'morgue'
+                 ELSE '' END as class
+          FROM planet_osm_point
+          WHERE way && !bbox!
+            AND (amenity IN ('hospital', 'clinic','pharmacy','mortuary')
+            OR tags->'health_facility_type' IN ('field_hospital', 'dispensary')
+            OR tags->'health_facility:type' IN ('field_hospital', 'dispensary'))
+        ) AS _
+  - <<: *layer
+    name: medical_poly
+    id:   medical_poly
     geometry: "polygon"
     properties:
       minzoom: 10
@@ -764,6 +847,7 @@ Layer:
           SELECT
             way,
             name,
+            'medical' as layer,
             CASE WHEN amenity = 'hospital' THEN 'hospital'
                  WHEN amenity = 'clinic' THEN 'clinic'
                  WHEN tags->'health_facility_type' = 'field_hospital' OR tags->'health_facility:type' = 'field_hospital' THEN 'field hospital'
@@ -791,6 +875,7 @@ Layer:
           SELECT
             way,
             name,
+            'communication' as layer,
             CASE WHEN "tower:type" = 'communication' OR man_made = 'communications_tower' THEN 'tower'
                  WHEN man_made = 'communications_dish' THEN 'dish'
                  WHEN amenity = 'community_information_kiosk' OR tags->'board_type' = 'notice' THEN 'notice board'
@@ -816,6 +901,7 @@ Layer:
           SELECT
             way,
             name,
+            'electric_utility' as layer,
             CASE WHEN power = 'generator' THEN 'generator'
                  WHEN power IN ('tower','pole','line','minor_line') THEN 'transmission'
                  WHEN power IN ('station','substation','sub_station','transformer') THEN 'distribution'
@@ -843,6 +929,7 @@ Layer:
           SELECT
             way,
             name,
+            'electric_utility' as layer,
             CASE WHEN power = 'generator' THEN 'generator'
                  WHEN power IN ('tower','pole','line','minor_line') THEN 'transmission'
                  WHEN power IN ('station','substation','sub_station','transformer') THEN 'distribution'
@@ -870,6 +957,7 @@ Layer:
           SELECT
             way,
             name,
+            'electric_utility' as layer,
             CASE WHEN power = 'generator' THEN 'generator'
                  WHEN power IN ('tower','pole','line','minor_line') THEN 'transmission'
                  WHEN power IN ('station','substation','sub_station','transformer') THEN 'distribution'
@@ -990,31 +1078,35 @@ Layer:
                  WHEN tourism IS NOT NULL THEN tourism
                  WHEN shop IS NOT NULL THEN shop
                  WHEN poi IS NOT NULL THEN poi
+                 WHEN leisure IS NOT NULL THEN leisure
                  WHEN place IS NOT NULL THEN place
                  WHEN "natural" IS NOT NULL THEN "natural"
                  WHEN man_made IS NOT NULL THEN man_made
                  ELSE '' END AS type,
             CASE WHEN amenity IN ('bank','bar','cafe','cinema','college','dentist','embassy','fuel','hospital','police','restaurant') THEN amenity
-                 WHEN amenity = 'bus_station' THEN 'bus'
+                 WHEN amenity = 'bus_station' OR highway = 'bus_stop' THEN 'bus'
                  WHEN amenity = 'doctors' THEN 'hospital'
                  WHEN amenity = 'fast_food' THEN 'fast-food'
                  WHEN amenity = 'fire_station' THEN 'fire-station'
                  WHEN amenity = 'ice_cream' OR shop = 'ice_cream' THEN 'ice-cream'
-                 WHEN amenity = 'kindergarten' THEN 'school'
+                 WHEN amenity IN ('kindergarten','school') THEN 'school'
                  WHEN amenity = 'place_of_worship' THEN 'place-of-worship'
                  WHEN amenity = 'pub' THEN 'bar'
                  WHEN amenity = 'public_building' THEN 'building'
                  WHEN amenity = 'swimming_pool' THEN 'swimming'
+                 WHEN leisure = 'swimming_pool' THEN 'swimming'
                  WHEN amenity = 'university' THEN 'college'
-                 WHEN amenity = 'townhall' THEN 'town-hall'
+                 WHEN amenity IN ('townhall','courthouse') THEN 'town-hall'
                  WHEN amenity IN ('post_box','post_office') THEN 'post'
+                 WHEN leisure IN ('pitch','sports_centre') THEN 'pitch'
+                 WHEN leisure = 'playground' THEN 'playground'
                  WHEN tourism IN ('museum','zoo') THEN tourism
                  WHEN tourism IN ('hotel','motel','hostel','guest_house') THEN 'lodging'
                  WHEN tourism = 'camp_site' THEN 'campsite'
                  WHEN shop IN ('bakery','bicycle','camera','car','laundry','music') THEN shop
-                 WHEN shop IN ('convenience','greengrocer','supermarket') THEN 'grocery'
+                 WHEN shop IN ('convenience','greengrocer','supermarket','marketplace') THEN 'grocery'
                  WHEN shop IN ('alcohol','beverages') THEN 'alcohol-shop'
-                 WHEN shop = 'art' THEN 'art-gallery'
+                 WHEN shop = 'art' OR amenity = 'arts_centre' THEN 'art-gallery'
                  WHEN shop = 'hifi' THEN 'music'
                  WHEN shop IN ('car_parts','car_repair') THEN 'car'
                  WHEN shop = 'clothes' THEN 'clothing-store'
@@ -1035,31 +1127,35 @@ Layer:
             CASE WHEN amenity IS NOT NULL THEN amenity
                  WHEN tourism IS NOT NULL THEN tourism
                  WHEN shop IS NOT NULL THEN shop
+                 WHEN leisure IS NOT NULL THEN leisure
                  WHEN place IS NOT NULL THEN place
                  WHEN "natural" IS NOT NULL THEN "natural"
                  WHEN man_made IS NOT NULL THEN man_made
                  ELSE '' END AS type,
             CASE WHEN amenity IN ('bank','bar','cafe','cinema','college','dentist','embassy','fuel','hospital','police','restaurant') THEN amenity
-                 WHEN amenity = 'bus_station' THEN 'bus'
+                 WHEN amenity = 'bus_station' OR highway = 'bus_stop' THEN 'bus'
                  WHEN amenity = 'doctors' THEN 'hospital'
                  WHEN amenity = 'fast_food' THEN 'fast-food'
                  WHEN amenity = 'fire_station' THEN 'fire-station'
                  WHEN amenity = 'ice_cream' OR shop = 'ice_cream' THEN 'ice-cream'
-                 WHEN amenity = 'kindergarten' THEN 'school'
+                 WHEN amenity IN ('kindergarten','school') THEN 'school'
                  WHEN amenity = 'place_of_worship' THEN 'place-of-worship'
                  WHEN amenity = 'pub' THEN 'bar'
                  WHEN amenity = 'public_building' THEN 'building'
                  WHEN amenity = 'swimming_pool' THEN 'swimming'
+                 WHEN leisure = 'swimming_pool' THEN 'swimming'
                  WHEN amenity = 'university' THEN 'college'
-                 WHEN amenity = 'townhall' THEN 'town-hall'
+                 WHEN amenity IN ('townhall','courthouse') THEN 'town-hall'
                  WHEN amenity IN ('post_box','post_office') THEN 'post'
+                 WHEN leisure IN ('pitch','sports_centre') THEN 'pitch'
+                 WHEN leisure = 'playground' THEN 'playground'
                  WHEN tourism IN ('museum','zoo') THEN tourism
                  WHEN tourism IN ('hotel','motel','hostel','guest_house') THEN 'lodging'
                  WHEN tourism = 'camp_site' THEN 'campsite'
                  WHEN shop IN ('bakery','bicycle','camera','car','laundry','music') THEN shop
-                 WHEN shop IN ('convenience','greengrocer','supermarket') THEN 'grocery'
+                 WHEN shop IN ('convenience','greengrocer','supermarket','marketplace') THEN 'grocery'
                  WHEN shop IN ('alcohol','beverages') THEN 'alcohol-shop'
-                 WHEN shop = 'art' THEN 'art-gallery'
+                 WHEN shop = 'art' OR amenity = 'arts_centre' THEN 'art-gallery'
                  WHEN shop = 'hifi' THEN 'music'
                  WHEN shop IN ('car_parts','car_repair') THEN 'car'
                  WHEN shop = 'clothes' THEN 'clothing-store'
@@ -1073,7 +1169,6 @@ Layer:
           FROM planet_osm_polygon
           WHERE way && !bbox!
         ) AS poi_label
-#  - hdm_label
   - <<: *layer
     id: road_label
     name: road_label

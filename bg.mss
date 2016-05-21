@@ -140,6 +140,9 @@ Map {
   [class='industrial'] {
     polygon-fill: @industrial;
   }
+  [class='military'] {
+    polygon-fill: darken(@industrial,10);
+  }
   [class='agriculture'] {
     polygon-fill: @agriculture;
   }
@@ -147,6 +150,7 @@ Map {
   [class='piste'] {
     polygon-fill: @snow;
   }
+  [class='stadium'],
   [class='park'],
   [class='garden'],
   [class='common'] {

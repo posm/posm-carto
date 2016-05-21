@@ -5,7 +5,7 @@
 // SITE
 // =====================================================================
 
-#site [class='shelter'] {
+#site_poly [class='shelter'] {
   ::shadow [zoom>=17] {
     polygon-fill: #000;
     polygon-opacity: 0.3;
@@ -33,7 +33,7 @@
   }
 }
 
-#site {
+#site_poly {
   ::residential [class='residential'] {
     polygon-fill: #fff;
     polygon-opacity: 0.7;
@@ -45,7 +45,7 @@
   }
 }
 
-#site {
+#site_poly {
   ::rubble0 [zoom<16]["class"="rubble"] {
     polygon-fill: @rubble;
     polygon-opacity: 0.3;
@@ -64,8 +64,7 @@
   }
 }
 
-#site,
-#site_line {
+#site_poly {
   ::camp [class='camp'] {
     polygon-fill:@camp;
     polygon-opacity: 0.7;
@@ -157,8 +156,6 @@
 // SANITATION
 // =====================================================================
 
-/*
-//#sanitation [class='waste'][geom='polygon'] {
 #sanitation_poly [class='waste'] {
   polygon-fill: #647e64;
   [zoom>=17] { 
@@ -168,7 +165,6 @@
   }
   opacity: 0.6;
 }
-*/
 
 
 // =====================================================================
@@ -187,7 +183,7 @@
 // MEDICAL
 // =====================================================================
 
-#medical {
+#medical_poly {
   polygon-fill: #fff;
   polygon-opacity: 0.5;
   polygon-comp-op: soft-light;
@@ -280,7 +276,7 @@
 // HDM LABEL
 // =====================================================================
 
-#hdm_label {
+#building_condition {
   ::building_condition [layer='building_condition'] {
     [zoom>=18] {
       text-name: '[class]';
@@ -294,17 +290,24 @@
   }
 }
 
-#hdm_label {
-  ::icon [tag!="emergency:helipad=potential"] [layer!='sanitation'] [zoom>=14] {
-    marker-file: url('img/humanitarian/[layer]/[class].svg');
-    [layer='water_source'] { 
-      marker-file: url('img/humanitarian/water_source/water.svg'); 
-      [potable='yes'] { marker-file: url('img/humanitarian/water_source/water-potable.svg'); }
-      [potable='no'] { marker-file: url('img/humanitarian/water_source/water-non-potable.svg'); }
-    }
-    [tag='emergency=fire_hydrant'] {
-      marker-file: url('img/humanitarian/emergency/hydrant.svg');
-    }
+// apply the humanitarian icons to points and areas:
+
+#communication,
+#electric_utility[class!='transmission'],
+#electric_utility_poly,
+#emergency,
+#emergency_poly,
+#medical,
+#medical_poly,
+#sanitation,
+#sanitation_poly,
+#site[class!='residential'],
+#site_poly[class!='residential'],
+#water_source,
+#water_source_poly {
+  ::icon [layer!='sanitation'] [class!='helicopter_potential'] [zoom>=14] {
+    [layer = 'water_source'] { marker-file: url('img/maki/water-18.svg'); }
+    [layer!= 'water_source'] { marker-file: url('img/humanitarian/[layer]/[class].svg'); }
     marker-fill: #000000;
     marker-line-color: #fff;
     marker-line-width: 0.2;
@@ -328,7 +331,7 @@
     text-transform: uppercase;
     text-face-name: @sans;
     text-character-spacing: -0.5;
-    text-halo-radius: 0.9;
+    text-halo-radius: 1.5;
     text-halo-fill: #fff;
     text-halo-rasterizer: fast;
     text-size: 10;
@@ -339,14 +342,14 @@
    }
   ::label [layer!='building_condition']
           [class!='camp']
-          [tag!="emergency:helipad=potential"] 
+          [class!="helicopter_potential"]
           [layer!='sanitation']
           [zoom>=18] {
     text-name: '[class]';
     text-transform: uppercase;
     text-face-name: @sans;
     text-character-spacing: -0.5;
-    text-halo-radius: 1.2;
+    text-halo-radius: 1.5;
     text-halo-fill: #fff;
     text-halo-rasterizer: fast;
     text-size: 10;
@@ -369,7 +372,7 @@
     text-wrap-width: 26;
     text-line-spacing: -6;
   }
-  ::label [tag="emergency:helipad=potential"][zoom>=18] {
+  ::label [class="helicopter_potential"][zoom>=18] {
     text-name: "'¿Potential Helicopter?'";
     text-face-name: @sans;
     text-fill: #333;
@@ -382,21 +385,34 @@
     text-dy: -13;
     text-wrap-width: 12;
   }
-  ::icon [tag="emergency:helipad=potential"][zoom>=18] {
-    marker-file: url('img/humanitarian/[layer]/[class].svg');
+  ::icon [class="helicopter_potential"][zoom>=18] {
+    marker-file: url('img/humanitarian/[layer]/helicopter.svg');
     marker-height: 24;
     marker-fill: #333;
     marker-fill-opacity: 0.8;
   }
-  ::camp [class='camp'][zoom>=17] {
-    text-name: '';
-    [tag='idp:camp_site=spontaneous_camp'] { text-name: 'IDP'; }
-    [tag='refugee=yes'] { text-name: 'REFUGEE'; }
-    text-face-name: @sans_bold;
-    text-size: 9;
-    text-fill: #480261;
-    text-halo-radius: 1.5;
-    text-halo-fill: #fff;
-    text-halo-opacity: 0.3;    
-  }
+}
+
+// overrides based on the 'potable' field:
+
+#water_source,
+#water_source_poly {
+  [class='drinking water'] { marker-file: url('img/humanitarian/water_source/water.svg'); }
+  [potable='yes'] { marker-file: url('img/humanitarian/water_source/water-potable.svg'); }
+  [potable='no'] { marker-file: url('img/humanitarian/water_source/water-non-potable.svg'); }
+}
+
+// additional label for camps
+
+#site[class='camp'][zoom>=17],
+#site_poly[class='camp'][zoom>=17] {
+  text-name: '';
+  [type='idp'] { text-name: 'IDP'; }
+  [type='refugee'] { text-name: 'REFUGEE'; }
+  text-face-name: @sans_bold;
+  text-size: 9;
+  text-fill: #480261;
+  text-halo-radius: 1.5;
+  text-halo-fill: #fff;
+  text-halo-opacity: 0.3;
 }
