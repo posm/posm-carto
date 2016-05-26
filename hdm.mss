@@ -337,7 +337,6 @@
     text-size: 10;
     text-dy: -11;
     //marker-allow-overlap: true;
-    text-line-spacing: -4;
     text-wrap-width: 13;
    }
   ::label [layer!='building_condition']
@@ -355,7 +354,6 @@
     text-size: 10;
     text-dy: -11;
     text-wrap-width: 26;
-    text-line-spacing: -6;
     [zoom>=20] { 
       text-allow-overlap: true;
     }
@@ -370,7 +368,6 @@
     text-size: 10;
     text-dy: 11;
     text-wrap-width: 26;
-    text-line-spacing: -6;
   }
   ::label [class="helicopter_potential"][zoom>=18] {
     text-name: "'¿Potential Helicopter?'";
