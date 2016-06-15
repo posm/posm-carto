@@ -167,9 +167,6 @@ Layer:
             'site' as layer,
             CASE WHEN amenity = 'shelter' OR tags->'shelter' = 'yes' THEN 'shelter'
                  WHEN tags->'refugee' = 'yes' OR tags->'idp:camp_site' = 'spontaneous_camp' THEN 'camp'
-                 WHEN landuse = 'residential' THEN 'residential'
-                 WHEN leisure = 'common' THEN 'common'
-                 WHEN landuse = 'brownfield' THEN 'rubble'
                  WHEN tags->'hazard' = 'landslide' OR tags->'hazard_type' = 'landslide' THEN 'landslide'
                  ELSE '' END as class,
             CASE WHEN tags->'refugee' = 'yes' THEN 'refugee'
@@ -178,11 +175,9 @@ Layer:
           FROM planet_osm_point
           WHERE way && !bbox!
             AND (amenity = 'shelter'
-            OR landuse IN ('residential','brownfield')
             OR tags->'shelter' = 'yes'
             OR tags->'refugee' = 'yes'
             OR tags->'idp:camp_site' = 'spontaneous_camp'
-            OR leisure = 'common'
             OR tags->'hazard_type' = 'landslide'
             OR tags->'hazard' = 'landslide')
         ) AS _
@@ -204,7 +199,6 @@ Layer:
             CASE WHEN amenity = 'shelter' OR tags->'shelter' = 'yes' THEN 'shelter'
                  WHEN tags->'refugee' = 'yes' OR tags->'idp:camp_site' = 'spontaneous_camp' THEN 'camp'
                  WHEN landuse = 'residential' THEN 'residential'
-                 WHEN leisure = 'common' THEN 'common'
                  WHEN landuse = 'brownfield' THEN 'rubble'
                  WHEN tags->'hazard' = 'landslide' OR tags->'hazard_type' = 'landslide' THEN 'landslide'
                  ELSE '' END as class,
@@ -218,7 +212,6 @@ Layer:
             OR tags->'shelter' = 'yes'
             OR tags->'refugee' = 'yes'
             OR tags->'idp:camp_site' = 'spontaneous_camp'
-            OR leisure = 'common'
             OR tags->'hazard_type' = 'landslide'
             OR tags->'hazard' = 'landslide')
         ) AS _
