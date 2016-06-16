@@ -301,11 +301,11 @@
 #medical_poly,
 #sanitation,
 #sanitation_poly,
-#site[class!='residential'],
+#site,
 #site_poly[class!='residential'],
 #water_source,
 #water_source_poly {
-  ::icon [layer!='sanitation'] [class!='helicopter_potential'] [zoom>=14] {
+  ::icon [layer!='sanitation'] [class!='helicopter_potential'] [class!='rubble'] [class!='landslide'] [zoom>=14] {
     [layer = 'water_source'] { marker-file: url('img/maki/water-18.svg'); }
     [layer!= 'water_source'] { marker-file: url('img/humanitarian/[layer]/[class].svg'); }
     marker-fill: #000000;
