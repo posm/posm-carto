@@ -44,7 +44,7 @@ clean:
 	@echo
 	@echo Building $@
 	@echo
-	@carto $< > $@ || (rm -f $@; false)
+	@carto -a 3.0.12 $< > $@ || (rm -f $@; false)
 
 
 .PHONY: DATABASE_URL
