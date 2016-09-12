@@ -1074,7 +1074,6 @@ Layer:
             CASE WHEN amenity IS NOT NULL THEN amenity
                  WHEN tourism IS NOT NULL THEN tourism
                  WHEN shop IS NOT NULL THEN shop
-                 WHEN poi IS NOT NULL THEN poi
                  WHEN leisure IS NOT NULL THEN leisure
                  WHEN place IS NOT NULL THEN place
                  WHEN "natural" IS NOT NULL THEN "natural"
