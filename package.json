@@ -8,7 +8,7 @@
   },
   "main": "index.js",
   "scripts": {
-    "start": "(set -a && source .env && make project.xml) && tessera mapnik://./project.xml"
+    "start": "(set -a && source .env && make project.xml) && tessera mapnik://./project.xml?metatile=2&bufferSize=0"
   },
   "author": "",
   "license": "ISC",
