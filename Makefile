@@ -71,7 +71,6 @@ endef
 db/shapefiles: shp/water_polygons.shp \
 	shp/water_polygons.dbf \
 	shp/water_polygons.prj \
-	shp/water_polygons.shx \
 	shp/water_polygons.index
 
 .SECONDARY: data/water_polygons.zip
@@ -83,8 +82,7 @@ data/water_polygons.zip:
 
 shp/%.shp \
 shp/%.dbf \
-shp/%.prj \
-shp/%.shx: data/%.zip
+shp/%.prj: data/%.zip
 	@mkdir -p $$(dirname $@)
 	unzip -ju $< -d $$(dirname $@)
 
