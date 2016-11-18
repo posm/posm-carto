@@ -53,7 +53,7 @@ distclean: clean
 
 .PRECIOUS: %.xml
 
-%.xml: %.mml db/natearth shp fonts
+%.xml: %.mml db/naturalearth shp fonts
 	@echo
 	@echo Building $@
 	@echo
@@ -77,8 +77,8 @@ db/postgis: db
 	$(call create_extension)
 
 define create_extension
-@psql -c "\dx $(subst db/,,$@)" | grep $(subst db/,,$@) > /dev/null 2>&1 || \
-	psql -v ON_ERROR_STOP=1 -qX1c "CREATE EXTENSION $(subst db/,,$@)"
+@psql -c "\dx $(notdir $@)" | grep $(notdir $@) > /dev/null 2>&1 || \
+	psql -v ON_ERROR_STOP=1 -qX1c "CREATE EXTENSION $(notdir $@)"
 endef
 
 shp: shp/water_polygons.shp \
@@ -90,8 +90,8 @@ shp: shp/water_polygons.shp \
 
 # so the zip matches the shapefile name
 data/water_polygons.zip:
-	@mkdir -p $$(dirname $@)
-	curl -Lf http://data.openstreetmapdata.com/water-polygons-split-3857.zip -z $@ -o $@
+	@mkdir -p $(dir $@)
+	curl -sfL http://data.openstreetmapdata.com/water-polygons-split-3857.zip -z $@ -o $@
 
 shp/%.shp \
 shp/%.dbf \
@@ -102,7 +102,7 @@ shp/%.prj: | data/%.zip
 shp/water_polygons.index: shp/water_polygons.shp
 	node_modules/.bin/mapnik-shapeindex.js $<
 
-db/natearth: db/ne_10m_rivers_lake_centerlines_scale_rank \
+db/naturalearth: db/ne_10m_rivers_lake_centerlines_scale_rank \
 		   db/ne_10m_admin_0_countries_lakes \
 		   db/ne_10m_admin_0_boundary_lines_map_units \
 		   db/ne_10m_roads \
@@ -149,13 +149,13 @@ define natural_earth_sources
 
 data/ne/$(1)/$(2)/%.zip:
 	@mkdir -p $$(dir $$@)
-	curl -fL http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/$(1)/$(2)/$$(@:data/ne/$(1)/$(2)/%=%) -o $$@
+	curl -sfL http://www.naturalearthdata.com/http//www.naturalearthdata.com/download/$(1)/$(2)/$$(@:data/ne/$(1)/$(2)/%=%) -o $$@
 
 .SECONDARY: data/ne/$(1)/$(2)/%.zip
 
 data/ne-stamen/$(1)/$(2)/%.zip:
 	@mkdir -p $$(dir $$@)
-	curl -fL "https://github.com/stamen/natural-earth-vector/blob/master/zips/$(1)_$(2)/$$(@:data/ne-stamen/$(1)/$(2)/%=%)?raw=true" -o $$@
+	curl -sfL "https://github.com/stamen/natural-earth-vector/blob/master/zips/$(1)_$(2)/$$(@:data/ne-stamen/$(1)/$(2)/%=%)?raw=true" -o $$@
 endef
 
 scales=10m 50m 110m
@@ -179,15 +179,15 @@ fonts/NotoSans%.ttf: | fonts/NotoSans.zip
 
 fonts/NotoSans.zip:
 	@mkdir -p $(dir $@)
-	curl -Lf https://noto-website.storage.googleapis.com/pkgs/Noto-unhinted.zip -o $@
+	curl -sLf https://noto-website.storage.googleapis.com/pkgs/Noto-unhinted.zip -o $@
 
 fonts/unifont-Medium.ttf:
 	@mkdir -p $(dir $@)
-	curl -Lf http://posm.s3.amazonaws.com/resources/unifont-8.0.01.ttf -o $@
+	curl -sfL http://posm.s3.amazonaws.com/resources/unifont-8.0.01.ttf -o $@
 
 fonts/DejaVuSans.zip:
-	@mkdir -p $$(dirname $@)
-	curl -Lf http://sourceforge.net/projects/dejavu/files/dejavu/2.35/dejavu-fonts-ttf-2.35.zip -o $@
+	@mkdir -p $(dir $@)
+	curl -sfL http://sourceforge.net/projects/dejavu/files/dejavu/2.35/dejavu-fonts-ttf-2.35.zip -o $@
 
 
 
