@@ -187,7 +187,7 @@ fonts/unifont-Medium.ttf:
 
 fonts/DejaVuSans.zip:
 	@mkdir -p $(dir $@)
-	curl -sfL http://sourceforge.net/projects/dejavu/files/dejavu/2.35/dejavu-fonts-ttf-2.35.zip -o $@
+	curl -sfL http://sourceforge.net/projects/dejavu/files/dejavu/2.37/dejavu-fonts-ttf-2.37.zip -o $@
 
 
 
