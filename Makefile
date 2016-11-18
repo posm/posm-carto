@@ -169,7 +169,8 @@ fonts: fonts/NotoSans-Regular.ttf \
 	fonts/unifont-Medium.ttf \
 	fonts/DejaVuSans.ttf \
 	fonts/DejaVuSans-Bold.ttf \
-	fonts/DejaVuSans-BoldOblique.ttf
+	fonts/DejaVuSans-BoldOblique.ttf \
+	fonts/DejaVuSans-Oblique.ttf
 
 fonts/DejaVuSans.ttf fonts/DejaVuSans%.ttf: | fonts/DejaVuSans.zip
 	unzip -qju $| *$(notdir $@) -d $(dir $@)
