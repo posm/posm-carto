@@ -16,6 +16,16 @@ $(foreach a,$(shell set -a && source .env 2> /dev/null; node_modules/.bin/pgexpl
 
 default: project
 
+smaller: | data/water_polygons.zip data/ne/10m/physical/ne_10m_lakes.zip \
+	data/ne/10m/physical/ne_10m_rivers_lake_centerlines_scale_rank.zip \
+	data/ne/10m/cultural/ne_10m_admin_0_boundary_lines_land.zip \
+	data/ne/10m/cultural/ne_10m_admin_1_states_provinces_lines.zip \
+	data/ne/10m/cultural/ne_10m_admin_1_label_points.zip \
+	data/ne/10m/cultural/ne_10m_admin_0_countries_lakes.zip data/ne/10m/cultural/ne_10m_roads.zip \
+	data/ne/10m/cultural/ne_10m_admin_0_boundary_lines_map_units.zip fonts/DejaVuSans.zip \
+	fonts/NotoSans.zip
+	truncate -s 0 $|
+
 .env:
 	@echo DATABASE_URL=postgres:///simple > $@
 
@@ -26,6 +36,9 @@ link:
 
 clean:
 	@rm -f *.mml *.xml
+
+distclean: clean
+	rm -rf data/ shp/ fonts/
 
 ## Generic Targets
 
@@ -40,7 +53,7 @@ clean:
 
 .PRECIOUS: %.xml
 
-%.xml: %.mml db/shapefiles db/natearth db/fonts
+%.xml: %.mml db/natearth shp fonts
 	@echo
 	@echo Building $@
 	@echo
@@ -68,7 +81,7 @@ define create_extension
 	psql -v ON_ERROR_STOP=1 -qX1c "CREATE EXTENSION $(subst db/,,$@)"
 endef
 
-db/shapefiles: shp/water_polygons.shp \
+shp: shp/water_polygons.shp \
 	shp/water_polygons.dbf \
 	shp/water_polygons.prj \
 	shp/water_polygons.index
@@ -82,9 +95,9 @@ data/water_polygons.zip:
 
 shp/%.shp \
 shp/%.dbf \
-shp/%.prj: data/%.zip
-	@mkdir -p $$(dirname $@)
-	unzip -ju $< -d $$(dirname $@)
+shp/%.prj: | data/%.zip
+	@mkdir -p $(dir $@)
+	unzip -qju $| -d $(dir $@)
 
 shp/water_polygons.index: shp/water_polygons.shp
 	node_modules/.bin/mapnik-shapeindex.js $<
@@ -99,12 +112,12 @@ db/natearth: db/ne_10m_rivers_lake_centerlines_scale_rank \
 		   db/ne_10m_admin_1_states_provinces_lines
 
 define natural_earth
-db/$(strip $(word 1, $(subst :, ,$(1)))): $(strip $(word 2, $(subst :, ,$(1)))) db/postgis
+db/$(strip $(word 1, $(subst :, ,$(1)))): | $(strip $(word 2, $(subst :, ,$(1)))) db/postgis
 	@psql -c "\d $(strip $(word 1, $(subst :, ,$(1))))" > /dev/null 2>&1 || \
 	ogr2ogr --config OGR_ENABLE_PARTIAL_REPROJECTION TRUE \
 			--config SHAPE_ENCODING WINDOWS-1252 \
 			--config PG_USE_COPY YES \
-			-nln $$(subst db/,,$$@) \
+			-nln $$(basename $$(notdir $$(word 1, $$|))) \
 			-t_srs EPSG:3857 \
 			-lco ENCODING=UTF-8 \
 			-nlt PROMOTE_TO_MULTI \
@@ -116,7 +129,7 @@ db/$(strip $(word 1, $(subst :, ,$(1)))): $(strip $(word 2, $(subst :, ,$(1)))) 
 			-segmentize 1 \
 			-skipfailures \
 			-f PGDump /vsistdout/ \
-			/vsizip/$$</$(strip $(word 3, $(subst :, ,$(1)))) | psql -q
+			/vsizip/$$(word 1, $$|)/$(strip $(word 3, $(subst :, ,$(1)))) | psql -q
 endef
 
 # <name>:<source file>:[shapefile]
@@ -150,26 +163,27 @@ themes=cultural physical raster
 
 $(foreach a,$(scales),$(foreach b,$(themes),$(eval $(call natural_earth_sources,$(a),$(b)))))
 
-db/fonts: fonts/NotoSans-Regular.ttf \
+fonts: fonts/NotoSans-Regular.ttf \
+	fonts/NotoSans-Bold.ttf \
+	fonts/NotoSans-BoldItalic.ttf \
 	fonts/unifont-Medium.ttf \
-	fonts/DejaVuSans.ttf
+	fonts/DejaVuSans.ttf \
+	fonts/DejaVuSans-Bold.ttf \
+	fonts/DejaVuSans-BoldOblique.ttf
 
-fonts/%.ttf: fonts/%.zip
-	unzip -ju $< -d $$(dirname $@)
+fonts/DejaVuSans.ttf fonts/DejaVuSans%.ttf: | fonts/DejaVuSans.zip
+	unzip -qju $| *$(notdir $@) -d $(dir $@)
 
-fonts/NotoSans-Regular.zip:
-	@mkdir -p $$(dirname $@)
+fonts/NotoSans%.ttf: | fonts/NotoSans.zip
+	unzip -qju $| $(notdir $@) -d $(dir $@)
+
+fonts/NotoSans.zip:
+	@mkdir -p $(dir $@)
 	curl -Lf https://noto-website.storage.googleapis.com/pkgs/Noto-unhinted.zip -o $@
 
-#fonts/OpenSans-Regular.zip:
-	#@mkdir -p $$(dirname $@)
-	#curl -Lf http://sourceforge.net/projects/dejavu/files/dejavu/2.35/dejavu-fonts-ttf-2.35.zip -o $@
-
-#fonts/unifont-Medium.zip:
 fonts/unifont-Medium.ttf:
-	@mkdir -p $$(dirname $@)
+	@mkdir -p $(dir $@)
 	curl -Lf http://posm.s3.amazonaws.com/resources/unifont-8.0.01.ttf -o $@
-	# curl -Lf http://unifoundry.com/pub/unifont-8.0.01/font-builds/unifont-8.0.01.ttf -o $@
 
 fonts/DejaVuSans.zip:
 	@mkdir -p $$(dirname $@)

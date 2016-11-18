@@ -9,6 +9,12 @@ npm install
 make .env
 ```
 
+On macOS (with [Homebrew](http://brew.sh)):
+
+```bash
+brew bundle
+```
+
 ## Importing Data
 
 This currently uses a Delaware extract from Geofabrik, mainly for its size.
@@ -30,6 +36,15 @@ osm2pgsql \
   -x \
   delaware-20151208.osm.pbf
 ```
+
+Once data has been imported, necessary disk space can be reduced by running:
+
+```bash
+make smaller
+```
+
+This will truncate source archives, preventing them from being re-downloaded when checking for the
+existence of database tables.
 
 ## Rendering
 
