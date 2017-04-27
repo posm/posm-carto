@@ -1253,3 +1253,15 @@ Layer:
             AND "addr:housenumber" IS NOT NULL
           ) AS housenumbers
         ) AS data
+
+  - <<: *layer
+    id: null_island
+    name: null_island
+    geometry: "point"
+    properties:
+      minzoom: 7
+      "buffer-size": 16
+    Datasource:
+      <<: *postgis
+      table: |-
+        (SELECT ST_Transform(ST_SetSRID(ST_MakePoint(0, 0), 4326), 3857) way) AS _

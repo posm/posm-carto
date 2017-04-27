@@ -30,3 +30,9 @@
     }
   }
 }
+
+#null_island {
+  marker-file: url('img/buoy.svg');
+  marker-line-color: #d33f49;
+  marker-width: 64;
+}
