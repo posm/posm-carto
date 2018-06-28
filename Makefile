@@ -115,7 +115,6 @@ define natural_earth
 db/$(strip $(word 1, $(subst :, ,$(1)))): | $(strip $(word 2, $(subst :, ,$(1)))) db/postgis
 	@psql -c "\d $(strip $(word 1, $(subst :, ,$(1))))" > /dev/null 2>&1 || \
 	ogr2ogr --config OGR_ENABLE_PARTIAL_REPROJECTION TRUE \
-			--config SHAPE_ENCODING WINDOWS-1252 \
 			--config PG_USE_COPY YES \
 			-nln $$(basename $$(notdir $$(word 1, $$|))) \
 			-t_srs EPSG:3857 \
