@@ -133,13 +133,13 @@ db/$(strip $(word 1, $(subst :, ,$(1)))): | $(strip $(word 2, $(subst :, ,$(1)))
 endef
 
 # <name>:<source file>:[shapefile]
-NATURAL_EARTH=ne_10m_rivers_lake_centerlines_scale_rank:data/ne/10m/physical/ne_10m_rivers_lake_centerlines_scale_rank.zip \
-	ne_10m_admin_0_countries_lakes:data/ne/10m/cultural/ne_10m_admin_0_countries_lakes.zip \
-	ne_10m_admin_0_boundary_lines_map_units:data/ne/10m/cultural/ne_10m_admin_0_boundary_lines_map_units.zip \
-	ne_10m_roads:data/ne/10m/cultural/ne_10m_roads.zip \
-	ne_10m_lakes:data/ne/10m/physical/ne_10m_lakes.zip \
-	ne_10m_admin_0_boundary_lines_land:data/ne/10m/cultural/ne_10m_admin_0_boundary_lines_land.zip \
-	ne_10m_admin_1_label_points:data/ne/10m/cultural/ne_10m_admin_1_label_points.zip \
+NATURAL_EARTH=ne_10m_rivers_lake_centerlines_scale_rank:data/ne/10m/physical/ne_10m_rivers_lake_centerlines_scale_rank.zip:ne_10m_rivers_lake_centerlines_scale_rank.shp \
+	ne_10m_admin_0_countries_lakes:data/ne/10m/cultural/ne_10m_admin_0_countries_lakes.zip:ne_10m_admin_0_countries_lakes.shp \
+	ne_10m_admin_0_boundary_lines_map_units:data/ne/10m/cultural/ne_10m_admin_0_boundary_lines_map_units.zip:ne_10m_admin_0_boundary_lines_map_units.shp \
+	ne_10m_roads:data/ne/10m/cultural/ne_10m_roads.zip:ne_10m_roads.zip/ne_10m_roads.shp \
+	ne_10m_lakes:data/ne/10m/physical/ne_10m_lakes.zip:ne_10m_lakes.shp \
+	ne_10m_admin_0_boundary_lines_land:data/ne/10m/cultural/ne_10m_admin_0_boundary_lines_land.zip:ne_10m_admin_0_boundary_lines_land.shp \
+	ne_10m_admin_1_label_points:data/ne/10m/cultural/ne_10m_admin_1_label_points.zip:ne_10m_admin_1_label_points.shp \
 	ne_10m_admin_1_states_provinces_lines:data/ne/10m/cultural/ne_10m_admin_1_states_provinces_lines.zip:ne_10m_admin_1_states_provinces_lines.shp
 
 $(foreach shape,$(NATURAL_EARTH),$(eval $(call natural_earth,$(shape))))
