@@ -184,7 +184,9 @@ fonts/NotoSans.zip:
 
 fonts/unifont-Medium.ttf:
 	@mkdir -p $(dir $@)
-	curl -sfL http://posm.s3.amazonaws.com/resources/unifont-8.0.01.ttf -o $@
+	curl -sfL https://ftp.gnu.org/gnu/unifont/unifont-11.0.03/unifont-11.0.03.tar.gz | tar zxf - unifont-11.0.03/font/precompiled/unifont-11.0.03.ttf
+	mv unifont-11.0.03/font/precompiled/unifont-11.0.03.ttf $@
+	rm -rf unifont-11.0.3
 
 fonts/DejaVuSans.zip:
 	@mkdir -p $(dir $@)
